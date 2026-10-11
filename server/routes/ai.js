@@ -69,10 +69,11 @@ async function queryGPT2(prompt) {
  */
 router.post('/copilot', async (req, res) => {
   try {
-    const { prompt } = req.body;
-    if (!prompt || typeof prompt !== 'string') {
-      return res.status(400).json({ success: false, message: 'A prompt is required.' });
+    const rawPrompt = req.body.prompt || req.body.message || req.body.query;
+    if (!rawPrompt || typeof rawPrompt !== 'string') {
+      return res.status(400).json({ success: false, message: 'A prompt or message is required.' });
     }
+    const prompt = rawPrompt.trim();
 
     const query = prompt.toLowerCase().trim();
 

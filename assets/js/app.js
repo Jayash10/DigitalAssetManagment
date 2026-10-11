@@ -30,8 +30,19 @@ document.addEventListener('DOMContentLoaded', () => {
     loadGlobalProfile();
     loadNotifications();
 
-    // 5. Load Initial Dashboard View
-    navigateToPage('pages/dashboard.html');
+    // 5. Load Initial View (handles deep links & DigiLocker returns)
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('page') === 'profile' || urlParams.has('digilocker')) {
+        navigateToPage('pages/profile.html');
+    } else if (urlParams.get('page') === 'upload') {
+        navigateToPage('pages/upload.html');
+    } else if (urlParams.get('page') === 'assets') {
+        navigateToPage('pages/assets.html');
+    } else if (urlParams.get('page') === 'categories') {
+        navigateToPage('pages/categories.html');
+    } else {
+        navigateToPage('pages/dashboard.html');
+    }
 });
 
 /**

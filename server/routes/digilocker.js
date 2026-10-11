@@ -160,10 +160,21 @@ const handleCallback = (req, res) => {
     session.completedAt = new Date().toISOString();
   }
 
-  // Redirect user back to the application profile/settings page with status banner
-  const targetUrl = failureReason
-    ? `/pages/profile.html?digilocker=error&reason=${encodeURIComponent(failureReason)}`
-    : `/pages/profile.html?digilocker=success&code=${encodeURIComponent(code || 'OK')}`;
+  const isLoginFlow = query.flow === 'login';
+
+  let targetUrl;
+  if (failureReason) {
+    targetUrl = isLoginFlow
+      ? `/login.html?digilocker=error&reason=${encodeURIComponent(failureReason)}`
+      : `/?digilocker=error&reason=${encodeURIComponent(failureReason)}&page=profile`;
+  } else {
+    if (isLoginFlow) {
+      const sessionToken = 'dam_session_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
+      targetUrl = `/login.html?digilocker=success&token=${encodeURIComponent(sessionToken)}`;
+    } else {
+      targetUrl = `/?digilocker=success&code=${encodeURIComponent(code || 'OK')}&page=profile`;
+    }
+  }
 
   return res.redirect(targetUrl);
 };

@@ -39,6 +39,18 @@
                     <span class="btn-text">Get OTP</span>
                     <span class="spinner"></span>
                 </button>
+
+                <div class="auth-divider" style="display: flex; align-items: center; margin: 18px 0; color: #64748b; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px;">
+                    <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
+                    <span style="padding: 0 10px; font-weight: 600;">or continue with</span>
+                    <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
+                </div>
+
+                <button id="btnDigiLockerLogin" type="button" class="btn-digilocker" style="width: 100%; padding: 12px; border-radius: 12px; background: #0052cc; color: white; border: none; font-weight: 600; font-size: 13.5px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s ease;">
+                    <i class="fa-solid fa-id-card"></i>
+                    <span>Connect DigiLocker ID</span>
+                </button>
+                <div id="digilockerLoginError" style="color: #ef4444; font-size: 12.5px; margin-top: 8px; text-align: center; display: none;"></div>
             </div>
 
             <!-- Step 2: OTP Verification -->
@@ -71,7 +83,8 @@
         </div>
     </div>
 
-    <!-- Auth Logic -->
+    <!-- Auth & Identity Scripts -->
+    <script src="assets/js/digilocker.js"></script>
     <script src="assets/js/login.js"></script>
 </body>
 </html>

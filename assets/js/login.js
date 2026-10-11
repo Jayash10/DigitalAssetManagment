@@ -18,6 +18,41 @@ document.addEventListener('DOMContentLoaded', () => {
     const countdownEl = document.getElementById('countdown');
     const otpInputs = document.querySelectorAll('.otp-input');
 
+    // Check for DigiLocker OAuth callback params
+    const urlParams = new URLSearchParams(window.location.search);
+    const digiStatus = urlParams.get('digilocker');
+    const digiToken = urlParams.get('token');
+    const digiReason = urlParams.get('reason');
+
+    if (digiStatus === 'success' && digiToken) {
+        localStorage.setItem('dam_token', digiToken);
+        localStorage.setItem('dam_user', JSON.stringify({
+            name: 'DigiLocker Verified User',
+            role: 'Administrator',
+            email: 'verified@digilocker.gov.in',
+            isDigilockerVerified: true
+        }));
+        window.location.href = '/';
+        return;
+    } else if (digiStatus === 'error' && digiReason) {
+        const digiErr = document.getElementById('digilockerLoginError');
+        if (digiErr) {
+            digiErr.style.display = 'block';
+            digiErr.textContent = 'DigiLocker: ' + decodeURIComponent(digiReason);
+        }
+    }
+
+    const btnDigiLogin = document.getElementById('btnDigiLockerLogin');
+    if (btnDigiLogin) {
+        btnDigiLogin.addEventListener('click', () => {
+            initiateDigiLockerFlow({
+                buttonId: 'btnDigiLockerLogin',
+                errorId: 'digilockerLoginError',
+                customRedirectUrl: window.location.origin + '/api/digilocker/callback?flow=login'
+            });
+        });
+    }
+
     let currentPhone = '';
     let resendTimer = null;
     let timeLeft = 30;
