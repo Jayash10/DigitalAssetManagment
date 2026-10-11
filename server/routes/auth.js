@@ -115,6 +115,58 @@ router.post('/send-otp', async (req, res) => {
         }
     }
 
+    // 1b. Direct Twilio Programmable SMS (using Twilio Phone Number)
+    if (!smsSent && twilio.accountSid && twilio.authToken && twilio.phoneNumber) {
+        try {
+            console.log(`🚀 [Twilio Direct SMS] Attempting direct message to ${phone}...`);
+            const msgUrl = `https://api.twilio.com/2010-04-01/Accounts/${twilio.accountSid}/Messages.json`;
+            const msgParams = new URLSearchParams();
+            msgParams.append('To', phone);
+            msgParams.append('From', twilio.phoneNumber);
+            msgParams.append('Body', `DAM Studio OTP: ${localOtp}. Valid for 5 minutes.`);
+
+            let msgRes = await fetch(msgUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Basic ' + Buffer.from(`${twilio.accountSid}:${twilio.authToken}`).toString('base64'),
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                },
+                body: msgParams
+            });
+
+            let msgData = await msgRes.json();
+            // If trial template restriction (572006), retry with Twilio trial template
+            if (!msgRes.ok && msgData.code === 572006) {
+                console.log(`ℹ️ [Twilio Direct SMS] Retrying with approved Twilio trial template...`);
+                const retryParams = new URLSearchParams();
+                retryParams.append('To', phone);
+                retryParams.append('From', twilio.phoneNumber);
+                retryParams.append('Body', 'sms_appointment_reminders');
+
+                msgRes = await fetch(msgUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Basic ' + Buffer.from(`${twilio.accountSid}:${twilio.authToken}`).toString('base64'),
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    },
+                    body: retryParams
+                });
+                msgData = await msgRes.json();
+            }
+
+            if (msgRes.ok && (msgData.status === 'queued' || msgData.status === 'sent')) {
+                console.log(`✅ [Twilio Direct SMS] Message successfully queued to ${phone}! SID: ${msgData.sid}`);
+                smsSent = true;
+                gatewayUsed = 'Twilio Programmable SMS';
+            } else {
+                console.warn(`⚠️ [Twilio Direct SMS Error]:`, msgData.message || msgData);
+                if (!smsError) smsError = msgData.message;
+            }
+        } catch (dirErr) {
+            console.error(`❌ [Twilio Direct SMS Exception]:`, dirErr.message);
+        }
+    }
+
     // 2. SECONDARY: Fast2SMS (Indian SMS Gateway)
     if (!smsSent && fast2smsKey) {
         try {
