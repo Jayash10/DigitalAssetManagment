@@ -187,9 +187,10 @@ router.post('/send-otp', async (req, res) => {
     console.warn(`⚠️  ============================================\n`);
     return res.json({
         success: true,
-        message: `OTP sent. Please check SMS on ${phone}. If not received, check server terminal.`,
+        message: `OTP generated for ${phone}. ${smsError ? 'SMS Notice: ' + smsError : ''}`,
         gateway: 'terminal',
-        sms_error: smsError
+        sms_error: smsError,
+        devOtp: localOtp
     });
 });
 
