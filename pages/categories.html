@@ -1,0 +1,66 @@
+<div class="categories-page" style="display: flex; flex-direction: column; gap: 24px;">
+    <!-- Page Header -->
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="font-size: 24px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px;">Categories Directory</h2>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-top: 4px;">Classify and group your assets for rapid team discovery and automated AI indexing.</p>
+        </div>
+        <button class="btn btn-primary" id="addCategoryBtn">
+            <i class="fa-solid fa-plus"></i> Add New Category
+        </button>
+    </div>
+
+    <!-- Category Grid Container -->
+    <div class="category-grid" id="categoryGrid">
+        <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px;">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size: 24px; margin-bottom: 10px; display: block;"></i>
+            Loading system categories...
+        </div>
+    </div>
+
+    <!-- Add Category Modal -->
+    <div class="modal" id="categoryModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-layer-group" style="color: var(--primary);"></i> Add New Category</h3>
+                <button class="modal-close-btn" id="closeCategoryModal">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form id="createCategoryForm">
+                <div class="modal-body">
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px; display: block; color: var(--text-secondary);">Category Name *</label>
+                        <input type="text" id="newCategoryName" placeholder="e.g. Marketing, Branding, UI Kits" required>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px; display: block; color: var(--text-secondary);">Category Icon</label>
+                        <select id="newCategoryIcon">
+                            <option value="fa-folder">📁 Folder (General)</option>
+                            <option value="fa-image">🖼️ Image / Photo</option>
+                            <option value="fa-video">🎥 Video / Motion</option>
+                            <option value="fa-file-lines">📄 Document / Report</option>
+                            <option value="fa-diagram-project">📊 Project / Architecture</option>
+                            <option value="fa-certificate">🏆 Certificate / Award</option>
+                            <option value="fa-palette">🎨 Design &amp; Artwork</option>
+                            <option value="fa-code">💻 Code / Development</option>
+                            <option value="fa-bullhorn">📢 Marketing &amp; PR</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px; display: block; color: var(--text-secondary);">Description (Optional)</label>
+                        <textarea id="newCategoryDesc" rows="3" placeholder="Briefly describe what belongs in this category..."></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" id="cancelCategoryModal">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Create Category</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

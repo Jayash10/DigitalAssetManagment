@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - DAM Studio</title>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/login.css">
+</head>
+<body>
+    <!-- Dynamic Animated Background -->
+    <div class="bg-shape shape-1"></div>
+    <div class="bg-shape shape-2"></div>
+    <div class="bg-shape shape-3"></div>
+
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="login-icon">
+                    <i class="fa-solid fa-shapes"></i>
+                </div>
+                <h1 class="login-title">DAM Studio</h1>
+                <p class="login-subtitle">Secure access to your digital assets</p>
+            </div>
+
+            <!-- Step 1: Mobile Number Input -->
+            <div id="step1" class="auth-step active">
+                <div class="form-group">
+                    <label class="input-label">Mobile Number</label>
+                    <div class="phone-input-wrapper">
+                        <span class="country-code">+91</span>
+                        <input type="tel" id="phoneInput" class="phone-input" placeholder="Enter 10-digit number" autocomplete="tel" maxlength="10">
+                    </div>
+                </div>
+                <div class="error-message" id="errorMsg1"></div>
+                <button id="sendOtpBtn" class="btn-primary" disabled>
+                    <span class="btn-text">Get OTP</span>
+                    <span class="spinner"></span>
+                </button>
+            </div>
+
+            <!-- Step 2: OTP Verification -->
+            <div id="step2" class="auth-step">
+                <div class="form-group">
+                    <label class="input-label">Enter 6-digit OTP sent to <span id="displayPhone"></span></label>
+                    <div class="otp-container">
+                        <input type="text" class="otp-input" maxlength="1" pattern="\d*">
+                        <input type="text" class="otp-input" maxlength="1" pattern="\d*">
+                        <input type="text" class="otp-input" maxlength="1" pattern="\d*">
+                        <input type="text" class="otp-input" maxlength="1" pattern="\d*">
+                        <input type="text" class="otp-input" maxlength="1" pattern="\d*">
+                        <input type="text" class="otp-input" maxlength="1" pattern="\d*">
+                    </div>
+                </div>
+                <div class="error-message" id="errorMsg2"></div>
+                <button id="verifyOtpBtn" class="btn-primary" disabled>
+                    <span class="btn-text">Verify & Proceed</span>
+                    <span class="spinner"></span>
+                </button>
+                
+                <div class="action-links">
+                    <button id="editPhoneBtn" class="link-btn"><i class="fa-solid fa-pen" style="font-size: 11px; margin-right: 4px;"></i> Edit Number</button>
+                    <div>
+                        <span id="countdown" class="countdown" style="display: none;">Resend OTP in 00:30</span>
+                        <button id="resendOtpBtn" class="link-btn" style="display: none;">Resend OTP</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Auth Logic -->
+    <script src="assets/js/login.js"></script>
+</body>
+</html>

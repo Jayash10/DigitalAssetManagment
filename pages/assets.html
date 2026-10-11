@@ -1,0 +1,106 @@
+<div class="assets-page" style="display: flex; flex-direction: column; gap: 20px;">
+    <!-- Page Header -->
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="font-size: 24px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px;">My Assets Library</h2>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-top: 4px;">Search, preview, organize, and manage your digital files in one central catalog.</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <button class="btn btn-ai" onclick="openAiStudio()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Studio
+            </button>
+            <button class="btn btn-primary" onclick="navigateToPage('pages/upload.html')">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Upload New Asset
+            </button>
+        </div>
+    </div>
+
+    <!-- Advanced Filter & Toolbar -->
+    <div class="filter-bar" style="background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 16px 20px; border-radius: var(--radius-lg); box-shadow: var(--shadow-card); display: flex; flex-wrap: wrap; gap: 12px; align-items: center;">
+        <div style="flex: 2; min-width: 240px; position: relative;">
+            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 16px; top: 15px; color: var(--text-muted);"></i>
+            <input type="text" id="searchAsset" placeholder="Filter by asset name, tags, or format..." style="padding-left: 42px; width: 100%;">
+        </div>
+
+        <select id="categoryFilter" style="flex: 1; min-width: 150px;">
+            <option value="all">All Categories</option>
+            <!-- Populated dynamically -->
+        </select>
+
+        <select id="typeFilter" style="flex: 1; min-width: 140px;">
+            <option value="all">All Types</option>
+            <option value="image">Images</option>
+            <option value="video">Videos</option>
+            <option value="document">Documents</option>
+            <option value="audio">Audio</option>
+            <option value="other">Other Files</option>
+        </select>
+
+        <select id="sortFilter" style="flex: 1; min-width: 160px;">
+            <option value="date_desc">Newest First</option>
+            <option value="date_asc">Oldest First</option>
+            <option value="name_asc">Title (A - Z)</option>
+            <option value="name_desc">Title (Z - A)</option>
+            <option value="size_desc">Largest Size</option>
+            <option value="downloads_desc">Most Downloaded</option>
+        </select>
+
+        <!-- View Switcher -->
+        <div class="view-toggle-group" style="background: var(--bg-body); border: 1px solid var(--border-subtle);">
+            <button class="view-btn-toggle active" id="viewGridBtn" title="Grid Card View">
+                <i class="fa-solid fa-grip"></i>
+            </button>
+            <button class="view-btn-toggle" id="viewListBtn" title="Table List View">
+                <i class="fa-solid fa-list"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- Live Assets Count Status -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px;">
+        <span id="assetCountStatus" style="font-size: 13.5px; color: var(--text-secondary); font-weight: 500;">Showing digital assets...</span>
+    </div>
+
+    <!-- Grid View Container -->
+    <div id="assetGrid" class="asset-grid">
+        <!-- Rendered dynamically -->
+    </div>
+
+    <!-- Table List View Container -->
+    <div id="assetTableWrapper" class="asset-table-container" style="display: none; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); box-shadow: var(--shadow-card);">
+        <table class="asset-table">
+            <thead>
+                <tr>
+                    <th>Asset Name</th>
+                    <th>Category</th>
+                    <th>Size</th>
+                    <th>Uploaded</th>
+                    <th>Downloads</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="assetTableBody">
+                <!-- Rendered dynamically -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Empty State Container -->
+    <div id="assetEmptyNotice" style="display: none;">
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <h3>No Assets Match Your Query</h3>
+            <p>Try clearing your search terms or filters, or synthesize a new vector graphic with AI.</p>
+            <div style="display: flex; justify-content: center; gap: 12px;">
+                <button class="btn btn-ai" onclick="openAiStudio()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> Generate in AI Studio
+                </button>
+                <button class="btn btn-primary" onclick="navigateToPage('pages/upload.html')">
+                    <i class="fa-solid fa-cloud-arrow-up"></i> Upload New File
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,90 @@
+<div class="search-page" style="display: flex; flex-direction: column; gap: 24px;">
+    <!-- Page Header -->
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h2 style="font-size: 24px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px;">Advanced Asset Search</h2>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-top: 4px;">Perform deep conceptual, semantic, and multi-attribute queries across your digital assets.</p>
+        </div>
+        <!-- Mode Switcher -->
+        <div style="display: flex; gap: 8px; background: var(--bg-card); padding: 4px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+            <button type="button" class="btn btn-secondary" id="searchModeStandardBtn" style="padding: 7px 14px; font-size: 13px;">
+                <i class="fa-solid fa-filter"></i> Keyword Search
+            </button>
+            <button type="button" class="btn btn-ai" id="searchModeAiBtn" style="padding: 7px 14px; font-size: 13px;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> ✨ AI Semantic Search
+            </button>
+        </div>
+    </div>
+
+    <!-- Search Input & Filters Box -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 26px; border-radius: var(--radius-xl); box-shadow: var(--shadow-card);">
+        <!-- Big Search Bar -->
+        <div style="display: flex; gap: 12px; margin-bottom: 20px;">
+            <div style="flex: 1; position: relative;">
+                <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 18px; top: 16px; font-size: 18px; color: var(--text-muted);"></i>
+                <input type="text" id="advSearchInput" placeholder="Try natural queries like: 'presentation decks for cloud', 'official certificates', 'vector logos'..." style="width: 100%; padding: 15px 18px 15px 50px; font-size: 15px;">
+            </div>
+            <button class="btn btn-primary" id="executeSearchBtn" style="padding: 0 28px; font-size: 15px;">
+                <i class="fa-solid fa-search"></i> Search
+            </button>
+            <button class="btn btn-secondary" id="resetSearchBtn" style="padding: 0 20px;" title="Reset Filters">
+                <i class="fa-solid fa-rotate-left"></i> Reset
+            </button>
+        </div>
+
+        <!-- Filter Selectors (Hidden in AI Semantic Mode or available for secondary constraints) -->
+        <div id="advFiltersRow" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 16px;">
+            <div>
+                <label style="font-size: 12.5px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">Category</label>
+                <select id="advCategoryFilter">
+                    <option value="all">All Categories</option>
+                </select>
+            </div>
+
+            <div>
+                <label style="font-size: 12.5px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">Asset Type</label>
+                <select id="advTypeFilter">
+                    <option value="all">All Types</option>
+                    <option value="image">Images</option>
+                    <option value="video">Videos</option>
+                    <option value="document">Documents</option>
+                    <option value="audio">Audio</option>
+                    <option value="other">Others</option>
+                </select>
+            </div>
+
+            <div>
+                <label style="font-size: 12.5px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">Sort By</label>
+                <select id="advSortFilter">
+                    <option value="date_desc">Newest First</option>
+                    <option value="date_asc">Oldest First</option>
+                    <option value="name_asc">Title (A - Z)</option>
+                    <option value="name_desc">Title (Z - A)</option>
+                    <option value="size_desc">Largest Size</option>
+                    <option value="downloads_desc">Most Downloaded</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Search Results Status Bar -->
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px;">
+        <span id="searchResultsStatus" style="font-size: 14.5px; font-weight: 600; color: var(--text-primary);">Enter keywords or choose filters above to begin searching.</span>
+    </div>
+
+    <!-- Results Grid -->
+    <div id="searchResultsGrid" class="asset-grid">
+        <!-- Rendered dynamically -->
+    </div>
+
+    <!-- Empty Search Notice -->
+    <div id="searchEmptyNotice" style="display: none;">
+        <div class="empty-state">
+            <div class="empty-state-icon">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </div>
+            <h3>No Matches Found</h3>
+            <p>We couldn't find any digital assets matching your current query. Try switching to AI Semantic Search or using broader search terms.</p>
+        </div>
+    </div>
+</div>

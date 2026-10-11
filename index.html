@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Digital Asset Management (DAM) System - AI-Powered Asset Management, Smart Tagging, and High-Performance Cloud Storage.">
+    <title>Digital Asset Management Studio</title>
+    <link rel="icon" type="image/svg+xml" href="assets/images/user.svg">
+
+    <!-- Theme Initialization to prevent flash -->
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('dam_theme') || 'dark';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+        })();
+    </script>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- CSS Design System -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+    <link rel="stylesheet" href="assets/css/components.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <div class="logo-icon-wrapper">
+                    <i class="fa-solid fa-shapes"></i>
+                </div>
+                <span>DAM Studio</span>
+            </div>
+
+            <ul class="menu">
+                <li class="active" data-page="pages/dashboard.html">
+                    <i class="fa-solid fa-house"></i>
+                    <span>Dashboard</span>
+                </li>
+
+                <li data-page="pages/upload.html">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>Upload Asset</span>
+                </li>
+
+                <li data-page="pages/assets.html">
+                    <i class="fa-solid fa-folder-open"></i>
+                    <span>My Assets</span>
+                </li>
+
+                <li data-page="pages/categories.html">
+                    <i class="fa-solid fa-layer-group"></i>
+                    <span>Categories</span>
+                </li>
+
+                <li data-page="pages/search.html">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Search</span>
+                </li>
+
+                <li data-page="pages/profile.html">
+                    <i class="fa-solid fa-user"></i>
+                    <span>Profile</span>
+                </li>
+
+                <li data-page="pages/settings.html">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </li>
+
+                <li id="logoutBtn">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>Logout</span>
+                </li>
+            </ul>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Top Navbar -->
+            <header class="topbar">
+                <div class="left">
+                    <button id="menuBtn" title="Toggle Sidebar">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h2 id="pageTitle">Dashboard</h2>
+                </div>
+
+                <div class="search-box">
+                    <i class="fa-solid fa-search"></i>
+                    <input type="text" id="globalSearchInput" placeholder="Search Assets, tags, files, extensions...">
+                </div>
+
+                <div class="right">
+                    <!-- AI Assistant Button -->
+                    <button class="topbar-ai-btn" id="openAiCopilotBtn" title="Open DAM AI Copilot Assistant">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i>
+                        <span>Ask AI</span>
+                    </button>
+
+                    <!-- Theme Switcher Button -->
+                    <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Dark/Light Mode">
+                        <i class="fa-solid fa-moon"></i>
+                    </button>
+
+                    <!-- Notification Wrapper -->
+                    <div class="notification-wrapper">
+                        <button class="notification" id="notifBtn" title="View Activities">
+                            <i class="fa-solid fa-bell"></i>
+                        </button>
+                        <div class="notification-dropdown" id="notifDropdown">
+                            <div class="notification-header">
+                                <h4>Recent Activities</h4>
+                                <span class="badge-pill badge-blue" id="notifCountBadge">0</span>
+                            </div>
+                            <ul class="notification-list" id="notifList">
+                                <li class="notification-item">
+                                    <i class="fa-solid fa-info"></i>
+                                    <div class="notif-text">
+                                        <b>System Ready</b>
+                                        <span class="notif-time">Just now</span>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Profile Avatar & Info -->
+                    <div class="profile" id="topbarProfileBtn" style="cursor: pointer;" title="Go to Profile">
+                        <img id="topbarAvatar" src="assets/images/user.png" alt="Jayash" onerror="this.src='assets/images/user.svg'">
+                        <div>
+                            <h4 id="topbarUserName">Jayash</h4>
+                            <small id="topbarUserRole">Administrator</small>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dynamic Content Area -->
+            <section id="content">
+                <!-- Pages load here dynamically -->
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toastContainer"></div>
+
+    <!-- AI Copilot Slide Drawer -->
+    <div class="ai-drawer-overlay" id="aiDrawerOverlay"></div>
+    <aside class="ai-copilot-drawer" id="aiCopilotDrawer">
+        <div class="ai-drawer-header">
+            <div class="ai-drawer-title">
+                <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary); font-size: 18px;"></i>
+                <h3>DAM AI Copilot</h3>
+                <span class="ai-status-pill">
+                    <span class="ai-status-dot"></span> Active
+                </span>
+            </div>
+            <button class="modal-close-btn" id="closeAiCopilotBtn" title="Close Copilot">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <div class="ai-drawer-messages" id="aiChatMessages">
+            <div class="ai-msg bot">
+                <div class="ai-msg-avatar"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                <div class="ai-msg-bubble">
+                    hi how can i help you
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick AI Suggestion Chips -->
+        <div class="ai-chips-container" id="aiChipsContainer">
+            <button class="ai-chip" type="button"><i class="fa-solid fa-shield-halved"></i> DigiLocker OAuth 2.0</button>
+            <button class="ai-chip" type="button"><i class="fa-solid fa-database"></i> Query data.gov.in</button>
+            <button class="ai-chip" type="button"><i class="fa-solid fa-triangle-exclamation"></i> Troubleshoot 400 Bad Request</button>
+            <button class="ai-chip" type="button"><i class="fa-solid fa-id-card"></i> Fetch Aadhaar XML</button>
+            <button class="ai-chip" type="button"><i class="fa-solid fa-hard-drive"></i> Storage breakdown</button>
+        </div>
+
+        <div class="ai-drawer-input-box">
+            <input type="text" id="aiChatInput" placeholder="Ask about DigiLocker, data.gov.in, 400/403 errors, storage...">
+            <button id="aiSendBtn" title="Send Question"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </aside>
+
+    <!-- Global AI Text-to-Asset Studio Modal -->
+    <div class="modal" id="aiStudioModal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i> AI Text-to-Asset Studio</h3>
+                <button class="modal-close-btn" onclick="closeModal('aiStudioModal')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="aiStudioForm">
+                <div class="modal-body">
+                    <div style="display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px;">
+                        <div>
+                            <div class="form-group" style="margin-bottom: 16px;">
+                                <label style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px; display: block;">Asset Prompt / Concept</label>
+                                <textarea id="aiStudioPrompt" rows="3" placeholder="e.g. Cyber Security Shield with glowing blue circuit gradients" required style="resize: vertical;"></textarea>
+                            </div>
+
+                            <div style="margin-bottom: 16px;">
+                                <label style="font-weight: 600; font-size: 12.5px; color: var(--text-secondary); margin-bottom: 6px; display: block;">Quick Creative Ideas:</label>
+                                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                                    <span class="ai-chip ai-studio-preset">Cyber Security Vector Shield</span>
+                                    <span class="ai-chip ai-studio-preset">Cloud Infrastructure Badge</span>
+                                    <span class="ai-chip ai-studio-preset">Executive Analytics Chart</span>
+                                    <span class="ai-chip ai-studio-preset">Modern Fintech Brand Logo</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 16px;">
+                                <label style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px; display: block;">Destination Category</label>
+                                <select id="aiStudioCategory">
+                                    <option value="Projects">Projects</option>
+                                    <option value="Images">Images</option>
+                                    <option value="Certificates">Certificates</option>
+                                    <option value="Others">Others</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-ai" id="aiStudioSubmitBtn" style="width: 100%; padding: 12px; margin-top: 10px;">
+                                <i class="fa-solid fa-wand-magic-sparkles"></i> Generate &amp; Save Asset
+                            </button>
+                        </div>
+
+                        <!-- Live Preview Box -->
+                        <div style="display: flex; flex-direction: column;">
+                            <label style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px;">Live Generation Preview</label>
+                            <div id="aiStudioPreviewBox" style="flex: 1; background: var(--bg-body); border: 1px dashed var(--border-strong); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; min-height: 240px; padding: 16px;">
+                                <div style="text-align: center; color: var(--text-muted);">
+                                    <i class="fa-solid fa-shapes" style="font-size: 40px; margin-bottom: 10px; opacity: 0.5;"></i>
+                                    <p style="font-size: 13px;">Type a prompt and click Generate to see the live SVG rendering here.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Global Asset Preview Modal -->
+    <div class="modal" id="assetPreviewModal">
+        <div class="modal-content modal-lg">
+            <div class="modal-header">
+                <h3 id="previewModalTitle"><i class="fa-solid fa-eye"></i> Asset Preview</h3>
+                <button class="modal-close-btn" onclick="closeModal('assetPreviewModal')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="preview-modal-layout">
+                    <div class="preview-media-box" id="previewMediaContainer">
+                        <!-- Media will render here -->
+                    </div>
+                    <div class="preview-info-box">
+                        <div class="preview-info-row">
+                            <span>Title:</span>
+                            <span id="previewAssetTitle">-</span>
+                        </div>
+                        <div class="preview-info-row">
+                            <span>Category:</span>
+                            <span id="previewAssetCategory" class="badge-pill badge-blue">-</span>
+                        </div>
+                        <div class="preview-info-row">
+                            <span>File Name:</span>
+                            <span id="previewAssetOriginalName" style="max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">-</span>
+                        </div>
+                        <div class="preview-info-row">
+                            <span>File Size:</span>
+                            <span id="previewAssetSize">-</span>
+                        </div>
+                        <div class="preview-info-row">
+                            <span>Type / MIME:</span>
+                            <span id="previewAssetMime">-</span>
+                        </div>
+                        <div class="preview-info-row">
+                            <span>Downloads:</span>
+                            <span id="previewAssetDownloads">0</span>
+                        </div>
+                        <div class="preview-info-row">
+                            <span>Uploaded:</span>
+                            <span id="previewAssetDate">-</span>
+                        </div>
+                        <div class="preview-info-row">
+                            <span>Tags:</span>
+                            <span id="previewAssetTags">-</span>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <label style="font-size: 12.5px; font-weight: 600; color: var(--text-muted);">Description:</label>
+                            <p id="previewAssetDesc" style="font-size: 13.5px; color: var(--text-secondary); margin-top: 4px; line-height: 1.5;">-</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('assetPreviewModal')">Close</button>
+                <button class="btn btn-primary" id="previewEditBtn"><i class="fa-solid fa-pen"></i> Edit Metadata</button>
+                <a class="btn btn-success" id="previewDownloadBtn" href="#" download><i class="fa-solid fa-download"></i> Download</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Global Asset Edit Modal -->
+    <div class="modal" id="assetEditModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-pen-to-square"></i> Edit Asset Metadata</h3>
+                <button class="modal-close-btn" onclick="closeModal('assetEditModal')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="editAssetForm">
+                <input type="hidden" id="editAssetId">
+                <div class="modal-body">
+                    <div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
+                        <button type="button" class="btn btn-ai" id="aiEnhanceModalBtn" onclick="aiEnhanceEditModal()" style="padding: 6px 14px; font-size: 12.5px;">
+                            <i class="fa-solid fa-wand-magic-sparkles"></i> AI Enhance
+                        </button>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px; display: block;">Asset Title</label>
+                        <input type="text" id="editAssetTitle" class="form-control" required>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px; display: block;">Category</label>
+                        <select id="editAssetCategory" class="form-control">
+                            <!-- Dynamically loaded -->
+                        </select>
+                    </div>
+                    <div class="form-group" style="margin-bottom: 16px;">
+                        <label style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px; display: block;">Tags (comma separated)</label>
+                        <input type="text" id="editAssetTags" placeholder="e.g. Design, Report, 2026">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight: 600; font-size: 13.5px; margin-bottom: 6px; display: block;">Description</label>
+                        <textarea id="editAssetDesc" rows="3" placeholder="Enter asset notes or details..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('assetEditModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary"><i class="fa-solid fa-check"></i> Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Confirm Delete Modal -->
+    <div class="modal" id="confirmDeleteModal">
+        <div class="modal-content" style="max-width: 440px; text-align: center;">
+            <div class="modal-body" style="padding: 30px 24px 10px 24px;">
+                <div style="width: 60px; height: 60px; border-radius: 50%; background: var(--danger-light); color: var(--danger); display: inline-flex; align-items: center; justify-content: center; font-size: 28px; margin-bottom: 16px;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <h3 style="font-size: 19px; color: var(--text-primary); margin-bottom: 8px;">Delete Asset?</h3>
+                <p style="color: var(--text-secondary); font-size: 14px; line-height: 1.5;">This will permanently remove the asset from your database and delete its physical file from storage. This action cannot be undone.</p>
+                <input type="hidden" id="deleteTargetAssetId">
+            </div>
+            <div class="modal-footer" style="justify-content: center; gap: 12px; padding: 20px;">
+                <button class="btn btn-secondary" onclick="closeModal('confirmDeleteModal')">Cancel</button>
+                <button class="btn btn-danger" id="executeDeleteAssetBtn"><i class="fa-solid fa-trash"></i> Permanently Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Core SPA & Feature Scripts -->
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/sidebar.js"></script>
+    <script src="assets/js/ai.js"></script>
+    <script src="assets/js/dashboard.js"></script>
+    <script src="assets/js/upload.js"></script>
+    <script src="assets/js/assets.js"></script>
+    <script src="assets/js/categories.js"></script>
+    <script src="assets/js/search.js"></script>
+    <script src="assets/js/profile.js"></script>
+    <script src="assets/js/digilocker.js"></script>
+    <script src="assets/js/settings.js"></script>
+</body>
+
+</html>

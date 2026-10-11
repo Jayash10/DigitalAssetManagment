@@ -1,0 +1,204 @@
+<div class="settings-page" style="display: flex; flex-direction: column; gap: 24px;">
+    <!-- Page Header -->
+    <div class="page-header">
+        <h2 style="font-size: 24px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px;">System Settings &amp; AI Configuration</h2>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-top: 4px;">Customize color themes, configure AI assistance, manage quotas, and monitor backend health.</p>
+    </div>
+
+    <!-- System Diagnostics Card -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 26px; border-radius: var(--radius-xl); box-shadow: var(--shadow-card);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-server" style="color: var(--primary);"></i> Backend Server Health
+            </h3>
+            <span class="badge-pill badge-green">
+                <span style="width: 7px; height: 7px; border-radius: 50%; background: var(--success); display: inline-block;"></span> Online &amp; Healthy
+            </span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px;">
+            <div style="background: var(--bg-body); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <small style="color: var(--text-muted); font-size: 12px; display: block; margin-bottom: 4px;">Node.js Runtime</small>
+                <b id="diagNodeVer" style="font-size: 15px; color: var(--text-primary);">-</b>
+            </div>
+
+            <div style="background: var(--bg-body); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <small style="color: var(--text-muted); font-size: 12px; display: block; margin-bottom: 4px;">Host Operating System</small>
+                <b id="diagPlatform" style="font-size: 14px; color: var(--text-primary); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block;" title="-">-</b>
+            </div>
+
+            <div style="background: var(--bg-body); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <small style="color: var(--text-muted); font-size: 12px; display: block; margin-bottom: 4px;">SQLite Database Size</small>
+                <b id="diagDbSize" style="font-size: 15px; color: var(--text-primary);">-</b>
+            </div>
+
+            <div style="background: var(--bg-body); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <small style="color: var(--text-muted); font-size: 12px; display: block; margin-bottom: 4px;">Server Uptime</small>
+                <b id="diagUptime" style="font-size: 15px; color: var(--text-primary);">-</b>
+            </div>
+
+            <div style="background: var(--bg-body); padding: 14px 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <small style="color: var(--text-muted); font-size: 12px; display: block; margin-bottom: 4px;">Heap Memory Usage</small>
+                <b id="diagMemory" style="font-size: 15px; color: var(--text-primary);">-</b>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid Configuration Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px;">
+        <!-- Appearance & Color Theme Card -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 26px; border-radius: var(--radius-xl); box-shadow: var(--shadow-card);">
+            <h3 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-palette" style="color: var(--primary);"></i> Appearance &amp; Color Theme
+            </h3>
+            <p style="color: var(--text-secondary); font-size: 13.5px; margin-bottom: 20px; line-height: 1.5;">
+                Select your preferred visual aesthetic. The theme synchronizes instantly across all views and saves to your local profile.
+            </p>
+
+            <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 20px;">
+                <!-- Dark Theme Option -->
+                <label style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: var(--radius-md); border: 2px solid var(--border-subtle); background: var(--bg-body); cursor: pointer; transition: all 0.2s;" id="darkThemeRadioBox">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <input type="radio" name="themeSelection" value="dark" id="themeRadioDark" style="width: auto;">
+                        <div>
+                            <b style="color: var(--text-primary); font-size: 14px; display: block;">Midnight Pro (Dark Mode)</b>
+                            <small style="color: var(--text-muted); font-size: 12px;">Deep obsidian canvas with electric indigo &amp; cyan glow</small>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 4px;">
+                        <span style="width: 14px; height: 14px; border-radius: 50%; background: #090d16; border: 1px solid #475569;"></span>
+                        <span style="width: 14px; height: 14px; border-radius: 50%; background: #6366f1;"></span>
+                        <span style="width: 14px; height: 14px; border-radius: 50%; background: #06b6d4;"></span>
+                    </div>
+                </label>
+
+                <!-- Light Theme Option -->
+                <label style="display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-radius: var(--radius-md); border: 2px solid var(--border-subtle); background: var(--bg-body); cursor: pointer; transition: all 0.2s;" id="lightThemeRadioBox">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <input type="radio" name="themeSelection" value="light" id="themeRadioLight" style="width: auto;">
+                        <div>
+                            <b style="color: var(--text-primary); font-size: 14px; display: block;">Studio Slate (Light Mode)</b>
+                            <small style="color: var(--text-muted); font-size: 12px;">Crisp clean surfaces with high-contrast typography</small>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 4px;">
+                        <span style="width: 14px; height: 14px; border-radius: 50%; background: #f8fafc; border: 1px solid #cbd5e1;"></span>
+                        <span style="width: 14px; height: 14px; border-radius: 50%; background: #6366f1;"></span>
+                        <span style="width: 14px; height: 14px; border-radius: 50%; background: #10b981;"></span>
+                    </div>
+                </label>
+            </div>
+
+            <button type="button" class="btn btn-primary" id="applyThemeBtn" style="width: 100%;">
+                <i class="fa-solid fa-check"></i> Apply Color Theme
+            </button>
+        </div>
+
+        <!-- AI Engine & Model Settings -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 26px; border-radius: var(--radius-xl); box-shadow: var(--shadow-card);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                <h3 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i> AI Engine &amp; Copilot
+                </h3>
+                <span class="badge-pill badge-ai">
+                    <i class="fa-solid fa-sparkles"></i> Active
+                </span>
+            </div>
+
+            <form id="aiConfigForm">
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">AI Provider Engine</label>
+                    <select id="aiProviderSelect">
+                        <option value="built-in">DAM Heuristic &amp; Semantic Engine (Fast &amp; Free)</option>
+                        <option value="gemini">Google Gemini 2.0 / 1.5 Pro</option>
+                        <option value="openai">OpenAI GPT-4o</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">External API Key (Optional)</label>
+                    <input type="password" id="aiApiKeyInput" placeholder="Enter key only if using external Gemini/OpenAI">
+                    <small style="color: var(--text-muted); font-size: 11.5px; margin-top: 4px; display: block;">Built-in engine operates fully offline with no API key needed.</small>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="aiSmartTaggingToggle" checked style="width: 18px; height: 18px;">
+                        <span style="font-size: 13px; font-weight: 600; color: var(--text-primary);">Enable Automatic AI Tagging &amp; Description on Upload</span>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-ai" style="width: 100%;">
+                    <i class="fa-solid fa-floppy-disk"></i> Save AI Preferences
+                </button>
+            </form>
+        </div>
+
+        <!-- Storage & Upload Preferences Form -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 26px; border-radius: var(--radius-xl); box-shadow: var(--shadow-card);">
+            <h3 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 18px; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-sliders" style="color: var(--primary);"></i> Storage &amp; Upload Quotas
+            </h3>
+
+            <form id="settingsForm">
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">Storage Allocation Quota (GB)</label>
+                    <input type="number" id="settingStorageQuota" min="1" max="1000">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">Maximum Upload File Size (MB)</label>
+                    <input type="number" id="settingMaxUpload" min="1" max="500">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <label style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">Allowed File Extensions</label>
+                    <input type="text" id="settingAllowedExts" placeholder=".png,.jpg,.pdf,.mp4,.zip,.svg">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 20px;">
+                    <label style="font-size: 13px; font-weight: 600; color: var(--text-secondary); margin-bottom: 6px; display: block;">Default Upload Category</label>
+                    <select id="settingDefaultCat">
+                        <option value="Images">Images</option>
+                        <option value="Videos">Videos</option>
+                        <option value="Documents">Documents</option>
+                        <option value="Projects">Projects</option>
+                        <option value="Certificates">Certificates</option>
+                        <option value="Others">Others</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fa-solid fa-floppy-disk"></i> Save System Quotas
+                </button>
+            </form>
+        </div>
+
+        <!-- Data Management & Backups -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 26px; border-radius: var(--radius-xl); box-shadow: var(--shadow-card); display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+                <h3 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin-bottom: 15px; display: flex; align-items: center; gap: 10px;">
+                    <i class="fa-solid fa-database" style="color: var(--primary);"></i> Data Ledger &amp; Backups
+                </h3>
+                <p style="color: var(--text-secondary); font-size: 13.5px; line-height: 1.5; margin-bottom: 20px;">
+                    Export your entire digital asset registry, user profile configurations, and category taxonomy into a standardized JSON ledger.
+                </p>
+
+                <div style="background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); border-left: 4px solid var(--primary); margin-bottom: 20px;">
+                    <b style="font-size: 13px; color: var(--text-primary); display: block; margin-bottom: 4px;">Metadata JSON Export</b>
+                    <p style="color: var(--text-muted); font-size: 12px; margin: 0;">Downloads all records without impacting the active database ledger.</p>
+                </div>
+
+                <a href="/api/settings/export" class="btn btn-primary" style="width: 100%; text-decoration: none; margin-bottom: 12px;" download>
+                    <i class="fa-solid fa-download"></i> Download Metadata JSON Backup
+                </a>
+            </div>
+
+            <div style="padding-top: 20px; border-top: 1px solid var(--border-subtle);">
+                <small style="color: var(--text-muted); font-size: 12px; display: block; text-align: center;">
+                    DAM Studio v2.0.0 &bull; AI-Powered Digital Asset Engine
+                </small>
+            </div>
+        </div>
+    </div>
+</div>

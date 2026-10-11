@@ -1,0 +1,430 @@
+const path = require('path');
+const fs = require('fs');
+const { Pool } = require('pg');
+const { createClient } = require('@supabase/supabase-js');
+
+// Ensure data and uploads directories exist locally
+const dataDir = path.join(__dirname, '..', 'data');
+const uploadsDir = path.join(__dirname, '..', 'uploads');
+
+if (!fs.existsSync(dataDir)) {
+  fs.mkdirSync(dataDir, { recursive: true });
+}
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir, { recursive: true });
+}
+
+// -----------------------------------------------------------------------------
+// Database Connection Layer (PostgreSQL / Supabase OR SQLite fallback)
+// -----------------------------------------------------------------------------
+const DATABASE_URL = process.env.DATABASE_URL;
+const isPostgres = Boolean(DATABASE_URL && DATABASE_URL.startsWith('postgres'));
+
+let pgPool = null;
+let sqliteDb = null;
+
+// Initialize Supabase Storage Client (if configured)
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_KEY || process.env.SUPABASE_ANON_KEY;
+const SUPABASE_STORAGE_BUCKET = process.env.SUPABASE_STORAGE_BUCKET || 'dam-assets';
+
+let supabaseClient = null;
+if (SUPABASE_URL && SUPABASE_KEY) {
+  try {
+    supabaseClient = createClient(SUPABASE_URL, SUPABASE_KEY);
+    console.log(`☁️  [Supabase Storage] Client initialized with bucket: "${SUPABASE_STORAGE_BUCKET}"`);
+  } catch (err) {
+    console.warn(`⚠️  [Supabase Storage] Initialization failed: ${err.message}`);
+  }
+}
+
+// Helper to translate SQLite '?' placeholders to PostgreSQL '$1, $2, ...'
+function convertPlaceholdersToPg(sql) {
+  let paramIndex = 1;
+  return sql.replace(/\?/g, () => `$${paramIndex++}`);
+}
+
+// Normalized async DB wrapper
+const db = {
+  isPostgres,
+
+  async query(sql, params = []) {
+    if (isPostgres) {
+      const pgSql = convertPlaceholdersToPg(sql);
+      const res = await pgPool.query(pgSql, params);
+      return res;
+    } else {
+      // SQLite synchronous execution wrapped in promise
+      const stmt = sqliteDb.prepare(sql);
+      const rows = stmt.all(...params);
+      return { rows, rowCount: rows.length };
+    }
+  },
+
+  async get(sql, params = []) {
+    if (isPostgres) {
+      const pgSql = convertPlaceholdersToPg(sql);
+      const res = await pgPool.query(pgSql, params);
+      return res.rows[0] || null;
+    } else {
+      const stmt = sqliteDb.prepare(sql);
+      const row = stmt.get(...params);
+      return row || null;
+    }
+  },
+
+  async all(sql, params = []) {
+    if (isPostgres) {
+      const pgSql = convertPlaceholdersToPg(sql);
+      const res = await pgPool.query(pgSql, params);
+      return res.rows;
+    } else {
+      const stmt = sqliteDb.prepare(sql);
+      return stmt.all(...params);
+    }
+  },
+
+  async run(sql, params = []) {
+    if (isPostgres) {
+      // In Postgres, append RETURNING id for INSERTs if not already present
+      let pgSql = sql;
+      if (/^\s*INSERT\s+INTO/i.test(sql) && !/RETURNING/i.test(sql)) {
+        pgSql += ' RETURNING id';
+      }
+      pgSql = convertPlaceholdersToPg(pgSql);
+      const res = await pgPool.query(pgSql, params);
+      const lastId = res.rows && res.rows[0] && res.rows[0].id ? res.rows[0].id : null;
+      return {
+        changes: res.rowCount,
+        lastInsertRowid: lastId,
+        rowCount: res.rowCount
+      };
+    } else {
+      const stmt = sqliteDb.prepare(sql);
+      const res = stmt.run(...params);
+      return {
+        changes: res.changes,
+        lastInsertRowid: res.lastInsertRowid,
+        rowCount: res.changes
+      };
+    }
+  },
+
+  async exec(sql) {
+    if (isPostgres) {
+      return await pgPool.query(sql);
+    } else {
+      return sqliteDb.exec(sql);
+    }
+  },
+
+  // Backwards-compatible prepare method for routes migrating to async
+  prepare(sql) {
+    return {
+      get: (...params) => db.get(sql, params),
+      all: (...params) => db.all(sql, params),
+      run: (...params) => db.run(sql, params)
+    };
+  }
+};
+
+// Initialize the active database driver
+if (isPostgres) {
+  console.log('🐘 [Database] Connecting to PostgreSQL (Supabase)...');
+  pgPool = new Pool({
+    connectionString: DATABASE_URL,
+    ssl: { rejectUnauthorized: false },
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 10000
+  });
+
+  pgPool.on('error', (err) => {
+    console.error('❌ [PostgreSQL Pool Error]:', err.message);
+  });
+} else {
+  console.log('📦 [Database] Running on local SQLite engine.');
+  const { DatabaseSync } = require('node:sqlite');
+  const dbPath = path.join(dataDir, 'dam.sqlite');
+  sqliteDb = new DatabaseSync(dbPath);
+  sqliteDb.exec('PRAGMA foreign_keys = ON;');
+}
+
+// Initialize tables across both engines
+async function initTables() {
+  if (isPostgres) {
+    await db.exec(`
+      CREATE TABLE IF NOT EXISTS categories (
+        id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT DEFAULT '',
+        icon TEXT DEFAULT 'fa-folder',
+        color_class TEXT DEFAULT 'other-icon',
+        created_at TEXT NOT NULL
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS categories_name_lower_unique ON categories (LOWER(name));
+
+      CREATE TABLE IF NOT EXISTS assets (
+        id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+        title TEXT NOT NULL,
+        filename TEXT NOT NULL,
+        original_name TEXT NOT NULL,
+        file_path TEXT NOT NULL,
+        mime_type TEXT NOT NULL,
+        file_type TEXT NOT NULL,
+        category TEXT NOT NULL DEFAULT 'Others',
+        size_bytes BIGINT NOT NULL DEFAULT 0,
+        tags TEXT DEFAULT '',
+        description TEXT DEFAULT '',
+        created_at TEXT NOT NULL,
+        downloads_count BIGINT DEFAULT 0
+      );
+
+      CREATE TABLE IF NOT EXISTS activity_log (
+        id BIGINT GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY,
+        action TEXT NOT NULL,
+        asset_name TEXT NOT NULL,
+        details TEXT DEFAULT '',
+        timestamp TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS user_profile (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        role TEXT NOT NULL,
+        avatar_url TEXT NOT NULL,
+        bio TEXT DEFAULT '',
+        storage_limit_mb INTEGER DEFAULT 20480
+      );
+
+      CREATE TABLE IF NOT EXISTS system_settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS otp_sessions (
+        phone TEXT PRIMARY KEY,
+        otp TEXT NOT NULL,
+        expires_at BIGINT NOT NULL
+      );
+    `);
+  } else {
+    sqliteDb.exec(`
+      CREATE TABLE IF NOT EXISTS categories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL UNIQUE COLLATE NOCASE,
+        description TEXT DEFAULT '',
+        icon TEXT DEFAULT 'fa-folder',
+        color_class TEXT DEFAULT 'other-icon',
+        created_at TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS assets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        title TEXT NOT NULL,
+        filename TEXT NOT NULL,
+        original_name TEXT NOT NULL,
+        file_path TEXT NOT NULL,
+        mime_type TEXT NOT NULL,
+        file_type TEXT NOT NULL,
+        category TEXT NOT NULL DEFAULT 'Others',
+        size_bytes INTEGER NOT NULL DEFAULT 0,
+        tags TEXT DEFAULT '',
+        description TEXT DEFAULT '',
+        created_at TEXT NOT NULL,
+        downloads_count INTEGER DEFAULT 0
+      );
+
+      CREATE TABLE IF NOT EXISTS activity_log (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        action TEXT NOT NULL,
+        asset_name TEXT NOT NULL,
+        details TEXT DEFAULT '',
+        timestamp TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS user_profile (
+        id INTEGER PRIMARY KEY CHECK (id = 1),
+        name TEXT NOT NULL,
+        email TEXT NOT NULL,
+        role TEXT NOT NULL,
+        avatar_url TEXT NOT NULL,
+        bio TEXT DEFAULT '',
+        storage_limit_mb INTEGER DEFAULT 20480
+      );
+
+      CREATE TABLE IF NOT EXISTS system_settings (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      );
+
+      CREATE TABLE IF NOT EXISTS otp_sessions (
+        phone TEXT PRIMARY KEY,
+        otp TEXT NOT NULL,
+        expires_at INTEGER NOT NULL
+      );
+    `);
+  }
+
+  await seedDefaults();
+}
+
+// Helper to determine file_type from mime_type or extension
+function getFileType(mimeType, ext) {
+  if (mimeType.startsWith('image/')) return 'image';
+  if (mimeType.startsWith('video/')) return 'video';
+  if (mimeType.startsWith('audio/')) return 'audio';
+  if (
+    mimeType.includes('pdf') ||
+    mimeType.includes('document') ||
+    mimeType.includes('word') ||
+    mimeType.includes('sheet') ||
+    mimeType.includes('presentation') ||
+    mimeType.includes('text') ||
+    ['.pdf', '.docx', '.doc', '.xlsx', '.xls', '.pptx', '.ppt', '.txt', '.md', '.csv'].includes(ext)
+  ) {
+    return 'document';
+  }
+  return 'other';
+}
+
+// Helper to log activities asynchronously
+async function logActivity(action, assetName, details = '') {
+  try {
+    await db.run(
+      'INSERT INTO activity_log (action, asset_name, details, timestamp) VALUES (?, ?, ?, ?)',
+      [action, assetName, details, new Date().toISOString()]
+    );
+  } catch (err) {
+    console.error('Error logging activity:', err.message);
+  }
+}
+
+// -----------------------------------------------------------------------------
+// Cloud Storage Helper (Supabase Storage with local fallback)
+// -----------------------------------------------------------------------------
+async function uploadToStorage(buffer, filename, mimeType) {
+  if (supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient.storage
+        .from(SUPABASE_STORAGE_BUCKET)
+        .upload(filename, buffer, {
+          contentType: mimeType,
+          upsert: true
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      const { data: publicData } = supabaseClient.storage
+        .from(SUPABASE_STORAGE_BUCKET)
+        .getPublicUrl(filename);
+
+      return {
+        path: publicData.publicUrl,
+        isCloud: true
+      };
+    } catch (err) {
+      console.warn(`⚠️  [Supabase Storage] Cloud upload failed, falling back to disk: ${err.message}`);
+    }
+  }
+
+  // Fallback: Local disk storage
+  const diskPath = path.join(uploadsDir, filename);
+  fs.writeFileSync(diskPath, buffer);
+  return {
+    path: `/uploads/${filename}`,
+    isCloud: false
+  };
+}
+
+async function deleteFromStorage(filename) {
+  if (supabaseClient) {
+    try {
+      await supabaseClient.storage
+        .from(SUPABASE_STORAGE_BUCKET)
+        .remove([filename]);
+    } catch (err) {
+      console.warn(`⚠️  [Supabase Storage] Cloud deletion warning: ${err.message}`);
+    }
+  }
+
+  const diskPath = path.join(uploadsDir, filename);
+  if (fs.existsSync(diskPath)) {
+    try {
+      fs.unlinkSync(diskPath);
+    } catch (_) {}
+  }
+}
+
+// Seed default data if empty
+async function seedDefaults() {
+  try {
+    // Check categories count
+    const catCount = await db.get('SELECT COUNT(*) as count FROM categories');
+    if (parseInt(catCount?.count || 0, 10) === 0) {
+      const defaultCats = [
+        { name: 'Images', description: 'Photos, illustrations, banners and graphics', icon: 'fa-image', color_class: 'image-icon' },
+        { name: 'Videos', description: 'Product teasers, demos, clips and tutorials', icon: 'fa-video', color_class: 'video-icon' },
+        { name: 'Documents', description: 'Reports, PDF presentations and spreadsheets', icon: 'fa-file-lines', color_class: 'document-icon' },
+        { name: 'Projects', description: 'Design prototypes, UI kits and source bundles', icon: 'fa-diagram-project', color_class: 'project-icon' },
+        { name: 'Certificates', description: 'Course completions, awards and credentials', icon: 'fa-certificate', color_class: 'certificate-icon' },
+        { name: 'Others', description: 'Miscellaneous archives, logs and configs', icon: 'fa-folder', color_class: 'other-icon' }
+      ];
+
+      for (const cat of defaultCats) {
+        await db.run(
+          'INSERT INTO categories (name, description, icon, color_class, created_at) VALUES (?, ?, ?, ?, ?)',
+          [cat.name, cat.description, cat.icon, cat.color_class, new Date().toISOString()]
+        );
+      }
+    }
+
+    // Check user profile
+    const profileCount = await db.get('SELECT COUNT(*) as count FROM user_profile WHERE id = 1');
+    if (parseInt(profileCount?.count || 0, 10) === 0) {
+      await db.run(
+        'INSERT INTO user_profile (id, name, email, role, avatar_url, bio, storage_limit_mb) VALUES (1, ?, ?, ?, ?, ?, ?)',
+        ['Jayash', 'jayash@dam.system', 'Administrator', 'assets/images/user.png', 'Lead Digital Asset Administrator & Manager', 20480]
+      );
+    }
+
+    // Check settings
+    const settingsCount = await db.get('SELECT COUNT(*) as count FROM system_settings');
+    if (parseInt(settingsCount?.count || 0, 10) === 0) {
+      const defaults = [
+        ['allowed_extensions', '.png,.jpg,.jpeg,.gif,.svg,.webp,.mp4,.webm,.mp3,.pdf,.docx,.xlsx,.pptx,.txt,.zip'],
+        ['max_upload_size_mb', '100'],
+        ['default_category', 'Images'],
+        ['auto_tagging', 'true'],
+        ['storage_quota_gb', '20']
+      ];
+      for (const [key, val] of defaults) {
+        await db.run(
+          'INSERT INTO system_settings (key, value) VALUES (?, ?)',
+          [key, val]
+        );
+      }
+    }
+  } catch (err) {
+    console.error('Error seeding defaults:', err.message);
+  }
+}
+
+// Start database initialization
+initTables().catch(err => {
+  console.error('❌ Database initialization error:', err.message);
+});
+
+module.exports = {
+  db,
+  isPostgres,
+  getFileType,
+  logActivity,
+  uploadToStorage,
+  deleteFromStorage,
+  supabaseClient,
+  uploadsDir
+};

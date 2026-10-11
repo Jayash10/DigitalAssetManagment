@@ -1,0 +1,109 @@
+<div class="dashboard">
+    <!-- Welcome Header -->
+    <div class="welcome-box">
+        <div>
+            <h2>Welcome Back, <span id="dashWelcomeName">Jayash</span> 👋</h2>
+            <p>Here is your digital asset ecosystem overview, AI insights, and storage utilization.</p>
+        </div>
+        <div style="display: flex; gap: 12px; z-index: 2;">
+            <button class="btn btn-ai" onclick="openAiStudio()" style="padding: 12px 20px;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Studio
+            </button>
+            <button class="primary-btn" onclick="navigateToPage('pages/upload.html')">
+                <i class="fa-solid fa-cloud-arrow-up"></i> Upload Asset
+            </button>
+        </div>
+    </div>
+
+    <!-- Live Statistics Cards -->
+    <div class="stats">
+        <div class="stat-card" style="cursor: pointer;" onclick="navigateToPage('pages/assets.html')">
+            <div class="icon blue">
+                <i class="fa-solid fa-folder-open"></i>
+            </div>
+            <div>
+                <h3 id="dashTotalAssets">0</h3>
+                <p>Total Assets</p>
+            </div>
+        </div>
+
+        <div class="stat-card" style="cursor: pointer;" onclick="navigateToPage('pages/assets.html', { type: 'image' })">
+            <div class="icon green">
+                <i class="fa-solid fa-image"></i>
+            </div>
+            <div>
+                <h3 id="dashImagesCount">0</h3>
+                <p>Images</p>
+            </div>
+        </div>
+
+        <div class="stat-card" style="cursor: pointer;" onclick="navigateToPage('pages/assets.html', { type: 'video' })">
+            <div class="icon orange">
+                <i class="fa-solid fa-video"></i>
+            </div>
+            <div>
+                <h3 id="dashVideosCount">0</h3>
+                <p>Videos</p>
+            </div>
+        </div>
+
+        <div class="stat-card" style="cursor: pointer;" onclick="navigateToPage('pages/assets.html', { type: 'document' })">
+            <div class="icon red">
+                <i class="fa-solid fa-file-lines"></i>
+            </div>
+            <div>
+                <h3 id="dashDocsCount">0</h3>
+                <p>Documents</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Storage Breakdown Card -->
+    <div class="storage-card">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h3 style="margin-bottom: 4px;">Cloud Storage Allocation</h3>
+                <p id="dashStorageText" style="color: var(--text-secondary); font-size: 14px;">Calculating storage allocation...</p>
+            </div>
+            <span class="badge-pill badge-blue" id="dashStorageBadge">0% Used</span>
+        </div>
+        <div class="progress" style="height: 12px; margin-top: 15px;">
+            <div class="progress-bar" id="dashStorageBar" style="width: 0%; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);"></div>
+        </div>
+    </div>
+
+    <!-- Recent Uploads Table -->
+    <div class="table-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary);">Recent Uploads</h3>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-ai" style="padding: 6px 14px; font-size: 13px;" onclick="openAiCopilot('Give me a summary of recently uploaded assets')">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI Summary
+                </button>
+                <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;" onclick="navigateToPage('pages/assets.html')">
+                    View All Assets <i class="fa-solid fa-arrow-right" style="font-size: 11px;"></i>
+                </button>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Asset Name</th>
+                    <th>Category</th>
+                    <th>Size</th>
+                    <th>Upload Date</th>
+                    <th>Downloads</th>
+                    <th style="text-align: right;">Actions</th>
+                </tr>
+            </thead>
+            <tbody id="dashRecentTableBody">
+                <tr>
+                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                        <i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px;"></i> Loading live digital assets...
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
