@@ -1,0 +1,237 @@
+<div class="plugins-page" style="display: flex; flex-direction: column; gap: 24px;">
+    <!-- Page Header -->
+    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 16px;">
+        <div>
+            <h2 style="font-size: 26px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.5px; display: flex; align-items: center; gap: 12px;">
+                <span style="display: inline-flex; width: 40px; height: 40px; border-radius: var(--radius-md); background: var(--primary-gradient); align-items: center; justify-content: center; color: white; font-size: 20px; box-shadow: var(--primary-glow);">
+                    <i class="fa-solid fa-puzzle-piece"></i>
+                </span>
+                Plugins &amp; Ecosystem Extensions
+            </h2>
+            <p style="color: var(--text-secondary); font-size: 14.5px; margin-top: 6px; max-width: 650px;">
+                Extend DAM Studio with SQLite embedded storage, AI neural models, Twilio 2FA, DigiLocker DPI, and custom enterprise connectors.
+            </p>
+        </div>
+
+        <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+            <button class="btn btn-secondary" id="refreshPluginsBtn" title="Refresh all plugin statuses">
+                <i class="fa-solid fa-arrows-rotate"></i> Refresh Status
+            </button>
+            <button class="btn btn-secondary" id="testAllPluginsBtn" title="Run diagnostic ping across all plugins">
+                <i class="fa-solid fa-heart-pulse" style="color: var(--danger);"></i> Health Check
+            </button>
+            <button class="btn btn-primary" id="openInstallPluginModalBtn" title="Add a custom plugin">
+                <i class="fa-solid fa-plus"></i> Install Plugin
+            </button>
+        </div>
+    </div>
+
+    <!-- Live Ecosystem Metrics Cards -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-card); position: relative; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Total Installed</span>
+                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(99, 102, 241, 0.12); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 17px;">
+                    <i class="fa-solid fa-cubes"></i>
+                </div>
+            </div>
+            <div style="font-size: 28px; font-weight: 800; color: var(--text-primary); margin-top: 10px;" id="metricTotalPlugins">8</div>
+            <div style="font-size: 12.5px; color: var(--text-secondary); margin-top: 4px;">Ecosystem Modules</div>
+        </div>
+
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-card); position: relative; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Active &amp; Live</span>
+                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(16, 185, 129, 0.12); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 17px;">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+            </div>
+            <div style="font-size: 28px; font-weight: 800; color: var(--success); margin-top: 10px;" id="metricActivePlugins">8</div>
+            <div style="font-size: 12.5px; color: var(--text-secondary); margin-top: 4px;">Running Zero-Failure</div>
+        </div>
+
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-card); position: relative; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Database Core</span>
+                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(59, 130, 246, 0.12); color: #3b82f6; display: flex; align-items: center; justify-content: center; font-size: 17px;">
+                    <i class="fa-solid fa-database"></i>
+                </div>
+            </div>
+            <div style="font-size: 20px; font-weight: 800; color: #3b82f6; margin-top: 14px;" id="metricDbEngine">SQLite 3 (WAL)</div>
+            <div style="font-size: 12.5px; color: var(--text-secondary); margin-top: 4px;">Sub-millisecond ACID latency</div>
+        </div>
+
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 20px; box-shadow: var(--shadow-card); position: relative; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="font-size: 13px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">AI &amp; Connectors</span>
+                <div style="width: 38px; height: 38px; border-radius: 10px; background: rgba(168, 85, 247, 0.12); color: #a855f7; display: flex; align-items: center; justify-content: center; font-size: 17px;">
+                    <i class="fa-solid fa-brain"></i>
+                </div>
+            </div>
+            <div style="font-size: 20px; font-weight: 800; color: #a855f7; margin-top: 14px;" id="metricAiNodes">3,725 Nodes</div>
+            <div style="font-size: 12.5px; color: var(--text-secondary); margin-top: 4px;">Neural Dialogue Vectors</div>
+        </div>
+    </div>
+
+    <!-- Filter & Search Toolbar -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: 18px 22px; box-shadow: var(--shadow-card); display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <!-- Search Input -->
+        <div style="position: relative; min-width: 280px; flex: 1;">
+            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px;"></i>
+            <input type="text" id="pluginSearchInput" placeholder="Filter plugins by name, category, or features..." style="width: 100%; padding: 10px 14px 10px 38px; background: var(--bg-body); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-primary); font-size: 13.5px; outline: none; transition: border-color 0.2s;">
+        </div>
+
+        <!-- Category Tabs -->
+        <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="pluginCategoryTabs">
+            <button class="btn btn-secondary active-filter-tab" data-category="ALL" style="padding: 7px 14px; font-size: 12.5px; border-radius: var(--radius-md);">
+                All (8)
+            </button>
+            <button class="btn btn-secondary" data-category="Core Database" style="padding: 7px 14px; font-size: 12.5px; border-radius: var(--radius-md);">
+                Database &amp; Storage
+            </button>
+            <button class="btn btn-secondary" data-category="Security & Auth" style="padding: 7px 14px; font-size: 12.5px; border-radius: var(--radius-md);">
+                Security &amp; Auth
+            </button>
+            <button class="btn btn-secondary" data-category="AI & Intelligence" style="padding: 7px 14px; font-size: 12.5px; border-radius: var(--radius-md);">
+                AI &amp; Neural
+            </button>
+            <button class="btn btn-secondary" data-category="Media Processing" style="padding: 7px 14px; font-size: 12.5px; border-radius: var(--radius-md);">
+                Media &amp; Webhooks
+            </button>
+        </div>
+    </div>
+
+    <!-- Plugins Grid Container -->
+    <div id="pluginsGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 20px;">
+        <!-- Loaded dynamically via plugins.js -->
+        <div style="grid-column: 1 / -1; text-align: center; padding: 60px 20px; color: var(--text-muted);">
+            <i class="fa-solid fa-spinner fa-spin" style="font-size: 32px; color: var(--primary); margin-bottom: 12px;"></i>
+            <p>Loading plugin registry from SQLite...</p>
+        </div>
+    </div>
+
+    <!-- Configure Plugin Modal -->
+    <div class="modal" id="pluginConfigModal">
+        <div class="modal-content" style="max-width: 580px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div id="configModalIcon" style="width: 36px; height: 36px; border-radius: 8px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                        <i class="fa-solid fa-gear"></i>
+                    </div>
+                    <div>
+                        <h3 id="configModalTitle" style="font-size: 18px; color: var(--text-primary); margin: 0;">Configure Plugin</h3>
+                        <small id="configModalSubtitle" style="color: var(--text-secondary); font-size: 12px;">Update plugin parameters in SQLite</small>
+                    </div>
+                </div>
+                <button type="button" class="close-btn" onclick="closeModal('pluginConfigModal')">&times;</button>
+            </div>
+            <form id="pluginConfigForm">
+                <input type="hidden" id="configPluginId">
+                <div class="modal-body" style="display: flex; flex-direction: column; gap: 16px;">
+                    <div id="configFieldsContainer" style="display: flex; flex-direction: column; gap: 14px;">
+                        <!-- Dynamic config fields or JSON editor -->
+                    </div>
+                    <div>
+                        <label style="font-size: 12.5px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 6px;">
+                            Advanced JSON Settings
+                        </label>
+                        <textarea id="configJsonRaw" rows="6" style="width: 100%; font-family: monospace; font-size: 12.5px; padding: 12px; background: var(--bg-body); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-primary); outline: none;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('pluginConfigModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="savePluginConfigBtn">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Configuration
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Diagnostic Test Modal -->
+    <div class="modal" id="pluginTestModal">
+        <div class="modal-content" style="max-width: 520px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(16, 185, 129, 0.12); color: var(--success); display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                        <i class="fa-solid fa-heart-pulse"></i>
+                    </div>
+                    <div>
+                        <h3 id="testModalTitle" style="font-size: 18px; color: var(--text-primary); margin: 0;">Live Diagnostic Ping</h3>
+                        <small id="testModalSubtitle" style="color: var(--text-secondary); font-size: 12px;">Real-time health verification</small>
+                    </div>
+                </div>
+                <button type="button" class="close-btn" onclick="closeModal('pluginTestModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="testModalBody" style="display: flex; flex-direction: column; gap: 14px;">
+                    <!-- Test output rendered here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeModal('pluginTestModal')">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Install Custom Plugin Modal -->
+    <div class="modal" id="pluginInstallModal">
+        <div class="modal-content" style="max-width: 560px;">
+            <div class="modal-header">
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="width: 36px; height: 36px; border-radius: 8px; background: var(--primary-light); color: var(--primary); display: flex; align-items: center; justify-content: center; font-size: 16px;">
+                        <i class="fa-solid fa-circle-plus"></i>
+                    </div>
+                    <div>
+                        <h3 style="font-size: 18px; color: var(--text-primary); margin: 0;">Install Custom Plugin</h3>
+                        <small style="color: var(--text-secondary); font-size: 12px;">Register a custom integration into SQLite</small>
+                    </div>
+                </div>
+                <button type="button" class="close-btn" onclick="closeModal('pluginInstallModal')">&times;</button>
+            </div>
+            <form id="installPluginForm">
+                <div class="modal-body" style="display: flex; flex-direction: column; gap: 14px;">
+                    <div class="form-group">
+                        <label style="font-weight: 600; font-size: 13px; display: block; margin-bottom: 6px;">Plugin ID *</label>
+                        <input type="text" id="installPluginId" required placeholder="e.g. s3_sync_engine, discord_webhook" style="width: 100%; padding: 10px 14px; background: var(--bg-body); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-primary);">
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight: 600; font-size: 13px; display: block; margin-bottom: 6px;">Plugin Name *</label>
+                        <input type="text" id="installPluginName" required placeholder="e.g. AWS S3 Auto Backup" style="width: 100%; padding: 10px 14px; background: var(--bg-body); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-primary);">
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <div class="form-group">
+                            <label style="font-weight: 600; font-size: 13px; display: block; margin-bottom: 6px;">Category *</label>
+                            <select id="installPluginCategory" style="width: 100%; padding: 10px 14px; background: var(--bg-body); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-primary);">
+                                <option value="Core Database">Core Database</option>
+                                <option value="Storage">Storage</option>
+                                <option value="Security & Auth">Security & Auth</option>
+                                <option value="AI & Intelligence">AI & Intelligence</option>
+                                <option value="Media Processing">Media Processing</option>
+                                <option value="Integrations" selected>Integrations</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label style="font-weight: 600; font-size: 13px; display: block; margin-bottom: 6px;">FontAwesome Icon</label>
+                            <input type="text" id="installPluginIcon" placeholder="fa-puzzle-piece" value="fa-puzzle-piece" style="width: 100%; padding: 10px 14px; background: var(--bg-body); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-primary);">
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight: 600; font-size: 13px; display: block; margin-bottom: 6px;">Description</label>
+                        <textarea id="installPluginDesc" rows="2" placeholder="Briefly explain what this plugin does..." style="width: 100%; padding: 10px 14px; background: var(--bg-body); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-primary);"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label style="font-weight: 600; font-size: 13px; display: block; margin-bottom: 6px;">Initial Configuration (JSON)</label>
+                        <textarea id="installPluginConfig" rows="3" placeholder='{"endpoint": "https://api.example.com", "enabled": true}' style="width: 100%; font-family: monospace; font-size: 12.5px; padding: 10px 14px; background: var(--bg-body); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); color: var(--text-primary);">{}</textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('pluginInstallModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitInstallPluginBtn">
+                        <i class="fa-solid fa-download"></i> Install &amp; Activate
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

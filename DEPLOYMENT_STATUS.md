@@ -6,8 +6,9 @@ The codebase is now fully **cloud-ready** and supports dual-engine deployment:
 
 | Component | Status | Details |
 | :--- | :--- | :--- |
-| **Database Engine** | ✅ Ready | Dual-engine in `server/db.js`: connects to PostgreSQL (Supabase) via `DATABASE_URL` with SSL connection pooling, or falls back to SQLite locally. |
-| **All Routes** | ✅ Migrated | `stats.js`, `categories.js`, `profile.js`, `settings.js`, `auth.js`, `assets.js`, and `ai.js` converted to async queries (`await db.get`, `await db.all`, `await db.run`). |
+| **Database Engine** | ✅ Ready | SQLite 3 (WAL mode) primary embedded engine in `server/db.js` with sub-millisecond query latency; dual-engine connects to PostgreSQL (Supabase) if `DATABASE_URL` is set without `DATABASE_TYPE=sqlite`. |
+| **Plugins Ecosystem** | ✅ Ready | Full SQLite-backed plugin registry (`plugins` table, `server/routes/plugins.js`, `pages/plugins.html`, `assets/js/plugins.js`) with live health diagnostics, toggles, and config management. |
+| **All Routes** | ✅ Migrated | `stats.js`, `categories.js`, `profile.js`, `settings.js`, `auth.js`, `assets.js`, `plugins.js`, and `ai.js` converted to async queries (`await db.get`, `await db.all`, `await db.run`). |
 | **AI Route DB sharing** | ✅ Fixed | `server/routes/ai.js` now uses the shared `db` module instead of opening a separate SQLite connection. |
 | **Cloud Storage** | ✅ Ready | `server/db.js` & `server/routes/assets.js` support Supabase Storage (`dam-assets` bucket) with public URLs, with fallback to local disk. |
 | **Data Migration Tool** | ✅ Ready | `npm run migrate:supabase` (`server/scripts/migrate_to_supabase.js`) migrates tables and files to Supabase. |

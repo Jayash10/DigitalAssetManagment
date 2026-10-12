@@ -162,6 +162,22 @@ async function loadSettingsAndDiagnostics() {
             }
             if (memEl) memEl.innerText = diagnostics.memory_heap_used || '-';
 
+            // Populate Plugins Status
+            if (settingsRes.data.plugins) {
+                const p = settingsRes.data.plugins;
+                const pDb = document.getElementById('pluginDbEngine');
+                const pStorage = document.getElementById('pluginStorageEngine');
+                const pSms = document.getElementById('pluginSmsEngine');
+                const pDigi = document.getElementById('pluginDigiEngine');
+                const pAi = document.getElementById('pluginAiEngine');
+
+                if (pDb && p.database) pDb.innerText = `${p.database.engine} — ${p.database.detail}`;
+                if (pStorage && p.storage) pStorage.innerText = `${p.storage.engine} — ${p.storage.detail}`;
+                if (pSms && p.sms_auth) pSms.innerText = `${p.sms_auth.engine} — ${p.sms_auth.detail}`;
+                if (pDigi && p.digilocker) pDigi.innerText = `${p.digilocker.engine} — ${p.digilocker.detail}`;
+                if (pAi && p.ai_copilot) pAi.innerText = `${p.ai_copilot.engine} — ${p.ai_copilot.detail}`;
+            }
+
             // Populate Form inputs
             const quotaInput = document.getElementById('settingStorageQuota');
             const maxInput = document.getElementById('settingMaxUpload');

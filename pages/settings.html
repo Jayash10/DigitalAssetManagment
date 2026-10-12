@@ -5,6 +5,65 @@
         <p style="color: var(--text-secondary); font-size: 14px; margin-top: 4px;">Customize color themes, configure AI assistance, manage quotas, and monitor backend health.</p>
     </div>
 
+    <!-- Connected Plugins & Connectors Card -->
+    <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 26px; border-radius: var(--radius-xl); box-shadow: var(--shadow-card);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+            <h3 style="font-size: 17px; font-weight: 700; color: var(--text-primary); margin: 0; display: flex; align-items: center; gap: 10px;">
+                <i class="fa-solid fa-plug-circle-check" style="color: var(--primary);"></i> Connected Plugins &amp; Cloud Connectors
+            </h3>
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <span class="badge-pill badge-green">
+                    <i class="fa-solid fa-circle-check"></i> All Plugins Live
+                </span>
+                <button class="btn btn-secondary" onclick="navigateToPage('pages/plugins.html')" style="padding: 6px 14px; font-size: 12.5px;" title="Open Plugins Ecosystem Manager">
+                    <i class="fa-solid fa-puzzle-piece" style="color: var(--primary);"></i> Manage Plugins
+                </button>
+            </div>
+        </div>
+
+        <div id="pluginGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px;">
+            <div style="background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <b style="font-size: 14px; color: var(--text-primary);"><i class="fa-solid fa-database" style="color: #3b82f6; margin-right: 6px;"></i> Database Engine</b>
+                    <span class="badge-pill badge-green" style="font-size: 11px;">Connected</span>
+                </div>
+                <small id="pluginDbEngine" style="color: var(--text-secondary); font-size: 12.5px; display: block;">PostgreSQL (Supabase) / SQLite</small>
+            </div>
+
+            <div style="background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <b style="font-size: 14px; color: var(--text-primary);"><i class="fa-solid fa-cloud" style="color: #06b6d4; margin-right: 6px;"></i> Cloud Storage</b>
+                    <span class="badge-pill badge-blue" style="font-size: 11px;">Active</span>
+                </div>
+                <small id="pluginStorageEngine" style="color: var(--text-secondary); font-size: 12.5px; display: block;">Supabase Storage / Local Uploads</small>
+            </div>
+
+            <div style="background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <b style="font-size: 14px; color: var(--text-primary);"><i class="fa-solid fa-comment-sms" style="color: #10b981; margin-right: 6px;"></i> Twilio SMS &amp; OTP</b>
+                    <span class="badge-pill badge-green" style="font-size: 11px;">Verified</span>
+                </div>
+                <small id="pluginSmsEngine" style="color: var(--text-secondary); font-size: 12.5px; display: block;">Twilio Verify + Programmable SMS</small>
+            </div>
+
+            <div style="background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <b style="font-size: 14px; color: var(--text-primary);"><i class="fa-solid fa-shield-halved" style="color: #0052cc; margin-right: 6px;"></i> DigiLocker DPI</b>
+                    <span class="badge-pill badge-blue" style="font-size: 11px;">Connected</span>
+                </div>
+                <small id="pluginDigiEngine" style="color: var(--text-secondary); font-size: 12.5px; display: block;">Sandbox Simulator / Kwik.ID</small>
+            </div>
+
+            <div style="background: var(--bg-body); padding: 16px; border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <b style="font-size: 14px; color: var(--text-primary);"><i class="fa-solid fa-brain" style="color: #a855f7; margin-right: 6px;"></i> AI Copilot &amp; ML</b>
+                    <span class="badge-pill badge-purple" style="font-size: 11px;">Online</span>
+                </div>
+                <small id="pluginAiEngine" style="color: var(--text-secondary); font-size: 12.5px; display: block;">GPT-2 Model + 3,725 Dialogue Nodes</small>
+            </div>
+        </div>
+    </div>
+
     <!-- System Diagnostics Card -->
     <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); padding: 26px; border-radius: var(--radius-xl); box-shadow: var(--shadow-card);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">

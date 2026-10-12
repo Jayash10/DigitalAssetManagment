@@ -110,6 +110,22 @@ db.exec(`
     answer TEXT NOT NULL,
     tokens TEXT DEFAULT ''
   );
+
+  -- Plugins & Integrations Ecosystem Table
+  CREATE TABLE IF NOT EXISTS plugins (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    description TEXT DEFAULT '',
+    category TEXT NOT NULL,
+    icon TEXT DEFAULT 'fa-puzzle-piece',
+    version TEXT DEFAULT '1.0.0',
+    author TEXT DEFAULT 'DAM Studio',
+    enabled INTEGER NOT NULL DEFAULT 1,
+    status TEXT NOT NULL DEFAULT 'Active',
+    config TEXT DEFAULT '{}',
+    installed_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL
+  );
 `);
 
 // 3. Create Optimization Indexes
@@ -237,6 +253,164 @@ if (assetCount === 0) {
     );
   }
   console.log(`✅ Seeded ${sampleAssets.length} Sample Digital Assets.`);
+}
+
+// 7b. Seed Default Plugins Ecosystem if empty
+const pluginCount = db.prepare('SELECT COUNT(*) as count FROM plugins').get().count;
+if (pluginCount === 0) {
+  const insertPlugin = db.prepare(`
+    INSERT INTO plugins (id, name, description, category, icon, version, author, enabled, status, config, installed_at, updated_at)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `);
+
+  const defaultPlugins = [
+    {
+      id: 'sqlite_core',
+      name: 'SQLite Core Engine',
+      description: 'ACID-compliant relational database engine with Write-Ahead Logging (WAL), high-speed in-memory indexing, and zero-latency local caching.',
+      category: 'Core Database',
+      icon: 'fa-database',
+      version: '3.45.0',
+      author: 'SQLite Development Team',
+      enabled: 1,
+      status: 'Active',
+      config: JSON.stringify({
+        storage_file: 'data/dam.sqlite',
+        journal_mode: 'WAL',
+        cache_size: 4096,
+        auto_vacuum: 'INCREMENTAL',
+        synchronous: 'NORMAL'
+      })
+    },
+    {
+      id: 'storage_connector',
+      name: 'Cloud & Local Storage Adapter',
+      description: 'Hybrid storage engine seamlessly streaming media between local filesystem and cloud object storage buckets with automatic fallbacks.',
+      category: 'Storage',
+      icon: 'fa-cloud-arrow-up',
+      version: '2.1.0',
+      author: 'DAM Studio Cloud',
+      enabled: 1,
+      status: 'Active',
+      config: JSON.stringify({
+        mode: 'hybrid_local_cloud',
+        upload_dir: 'uploads',
+        bucket: 'dam-assets',
+        max_file_size_mb: 100,
+        mime_validation: true
+      })
+    },
+    {
+      id: 'twilio_sms',
+      name: 'Twilio SMS & OTP Gateway',
+      description: 'Enterprise 2FA authentication layer providing mobile OTP generation, instant delivery verification, and developer simulation mode.',
+      category: 'Security & Auth',
+      icon: 'fa-comment-sms',
+      version: '1.4.2',
+      author: 'Twilio Integration',
+      enabled: 1,
+      status: 'Active',
+      config: JSON.stringify({
+        provider: 'twilio',
+        otp_expiry_minutes: 5,
+        allow_sandbox_otp: true,
+        sender_phone: '+17372508034'
+      })
+    },
+    {
+      id: 'digilocker_dpi',
+      name: 'DigiLocker DPI Citizen Identity',
+      description: 'National Digital Public Infrastructure connector for paperless citizen KYC verification and government credential authentication.',
+      category: 'Government & Identity',
+      icon: 'fa-shield-halved',
+      version: '2.0.1',
+      author: 'National Informatics / Kwik.ID',
+      enabled: 1,
+      status: 'Active',
+      config: JSON.stringify({
+        mode: 'sandbox_simulator',
+        compliance: 'ISO_27001',
+        auto_import_docs: true,
+        auth_timeout_sec: 120
+      })
+    },
+    {
+      id: 'ai_copilot',
+      name: 'Neural AI Copilot & Semantic Search',
+      description: 'On-device semantic knowledge base, natural language query parser, and auto-tagging assistant with 3,725 trained nodes.',
+      category: 'AI & Intelligence',
+      icon: 'fa-brain',
+      version: '2.5.0',
+      author: 'DAM AI Labs',
+      enabled: 1,
+      status: 'Active',
+      config: JSON.stringify({
+        model_type: 'gpt2_dialogue_transformer',
+        dataset_path: 'data/chatbot_dataset.csv',
+        temperature: 0.7,
+        max_tokens: 150,
+        auto_tagging_confidence: 0.82
+      })
+    },
+    {
+      id: 'media_optimizer',
+      name: 'Asset Optimizer & WebP Engine',
+      description: 'Real-time media pipeline generating high-resolution responsive thumbnails and optimizing preview footprints on ingest.',
+      category: 'Media Processing',
+      icon: 'fa-wand-magic-sparkles',
+      version: '1.2.0',
+      author: 'DAM Media Pipeline',
+      enabled: 1,
+      status: 'Active',
+      config: JSON.stringify({
+        enable_webp_conversion: true,
+        quality: 85,
+        generate_thumbnails: true,
+        thumbnail_size: 320
+      })
+    },
+    {
+      id: 'watermark_security',
+      name: 'Digital Watermark & Rights Guard',
+      description: 'Applies dynamic copyright watermarks, license metadata, and asset tracking stamps to confidential assets.',
+      category: 'Security & Auth',
+      icon: 'fa-stamp',
+      version: '1.1.0',
+      author: 'DAM Security Suite',
+      enabled: 1,
+      status: 'Active',
+      config: JSON.stringify({
+        watermark_text: 'DAM Studio Confidential',
+        opacity: 0.35,
+        position: 'bottom-right',
+        apply_on_download: false
+      })
+    },
+    {
+      id: 'webhook_broadcaster',
+      name: 'Event Webhooks & Audit Dispatcher',
+      description: 'Emits webhook events (asset uploaded, downloaded, deleted, tagged) to Slack, Discord, or enterprise endpoints.',
+      category: 'Integrations',
+      icon: 'fa-bolt',
+      version: '1.0.5',
+      author: 'DAM Studio Connect',
+      enabled: 1,
+      status: 'Active',
+      config: JSON.stringify({
+        endpoints: [],
+        retry_attempts: 3,
+        events: ['asset.upload', 'asset.download', 'asset.delete', 'user.login']
+      })
+    }
+  ];
+
+  for (const p of defaultPlugins) {
+    insertPlugin.run(
+      p.id, p.name, p.description, p.category, p.icon, p.version, p.author,
+      p.enabled, p.status, p.config, new Date().toISOString(), new Date().toISOString()
+    );
+  }
+  console.log(`✅ Seeded ${defaultPlugins.length} Ecosystem Plugins into SQLite.`);
 }
 
 // 8. Trigger Chatbot Training & Verification

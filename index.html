@@ -63,6 +63,11 @@
                     <span>Categories</span>
                 </li>
 
+                <li data-page="pages/plugins.html">
+                    <i class="fa-solid fa-puzzle-piece"></i>
+                    <span>Plugins</span>
+                </li>
+
                 <li data-page="pages/search.html">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <span>Search</span>
@@ -135,12 +140,36 @@
                         </div>
                     </div>
 
-                    <!-- Profile Avatar & Info -->
-                    <div class="profile" id="topbarProfileBtn" style="cursor: pointer;" title="Go to Profile">
-                        <img id="topbarAvatar" src="assets/images/user.png" alt="Jayash" onerror="this.src='assets/images/user.svg'">
-                        <div>
-                            <h4 id="topbarUserName">Jayash</h4>
-                            <small id="topbarUserRole">Administrator</small>
+                    <!-- Profile Avatar & Info with Dropdown -->
+                    <div class="profile-wrapper" style="position: relative;">
+                        <div class="profile" id="topbarProfileBtn" style="cursor: pointer;" title="Account Options">
+                            <img id="topbarAvatar" src="assets/images/user.png" alt="User" onerror="this.src='assets/images/user.svg'">
+                            <div>
+                                <h4 id="topbarUserName">Citizen</h4>
+                                <small id="topbarUserRole">User</small>
+                            </div>
+                            <i class="fa-solid fa-chevron-down" style="font-size: 10px; color: var(--text-muted); margin-left: 2px;"></i>
+                        </div>
+
+                        <!-- Dropdown Menu -->
+                        <div class="profile-dropdown" id="profileDropdown" style="display: none; position: absolute; right: 0; top: calc(100% + 10px); width: 220px; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 1000; padding: 8px 0; backdrop-filter: blur(12px);">
+                            <div style="padding: 10px 16px; border-bottom: 1px solid var(--border-subtle); margin-bottom: 6px;">
+                                <div style="font-weight: 700; font-size: 13.5px; color: var(--text-primary);" id="dropMenuName">Citizen</div>
+                                <div style="font-size: 11px; color: var(--primary); font-weight: 600;" id="dropMenuPhone">Active Session</div>
+                            </div>
+                            <a href="#" onclick="navigateToPage('pages/profile.html'); document.getElementById('profileDropdown').style.display='none'; return false;" style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--text-primary); text-decoration: none; font-size: 13px; transition: background 0.2s;">
+                                <i class="fa-solid fa-user-shield" style="width: 16px; color: var(--primary);"></i>
+                                <span>My Profile &amp; KYC</span>
+                            </a>
+                            <a href="#" onclick="navigateToPage('pages/assets.html'); document.getElementById('profileDropdown').style.display='none'; return false;" style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: var(--text-primary); text-decoration: none; font-size: 13px; transition: background 0.2s;">
+                                <i class="fa-solid fa-folder-open" style="width: 16px; color: #10b981;"></i>
+                                <span>My Vault Assets</span>
+                            </a>
+                            <div style="height: 1px; background: var(--border-subtle); margin: 6px 0;"></div>
+                            <a href="#" onclick="performLogout(); return false;" style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: #ef4444; text-decoration: none; font-size: 13px; font-weight: 600; transition: background 0.2s;">
+                                <i class="fa-solid fa-right-from-bracket" style="width: 16px;"></i>
+                                <span>Sign Out / Switch</span>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -155,6 +184,17 @@
 
     <!-- Toast Notifications Container -->
     <div id="toastContainer"></div>
+
+    <!-- SVG Gradient Defs (for gauge ring — referenced by ID across DOM) -->
+    <svg width="0" height="0" style="position:absolute;">
+        <defs>
+            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%"   stop-color="#6366f1"/>
+                <stop offset="50%"  stop-color="#8b5cf6"/>
+                <stop offset="100%" stop-color="#06b6d4"/>
+            </linearGradient>
+        </defs>
+    </svg>
 
     <!-- AI Copilot Slide Drawer -->
     <div class="ai-drawer-overlay" id="aiDrawerOverlay"></div>
@@ -392,6 +432,7 @@
     <script src="assets/js/profile.js"></script>
     <script src="assets/js/digilocker.js"></script>
     <script src="assets/js/settings.js"></script>
+    <script src="assets/js/plugins.js"></script>
 </body>
 
 </html>

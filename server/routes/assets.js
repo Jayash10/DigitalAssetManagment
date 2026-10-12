@@ -4,6 +4,10 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
 const { db, getFileType, logActivity, uploadToStorage, deleteFromStorage, uploadsDir } = require('../db');
+const { authMiddleware } = require('../middleware/auth');
+
+// Apply auth to all asset routes
+router.use(authMiddleware);
 
 // Configure Multer storage
 const storage = multer.diskStorage({
@@ -46,13 +50,14 @@ function getAssetIcon(fileType, mimeType, ext) {
   return 'fa-file';
 }
 
-// GET /api/assets - List & Filter
+// GET /api/assets - List & Filter (scoped to current user)
 router.get('/', async (req, res) => {
   try {
     const { search, category, type, sort } = req.query;
+    const userId = req.userId;
 
-    let query = 'SELECT * FROM assets WHERE 1=1';
-    const params = [];
+    let query = 'SELECT * FROM assets WHERE user_id = ?';
+    const params = [userId];
 
     if (search && search.trim() !== '') {
       const s = `%${search.trim()}%`;
@@ -122,11 +127,11 @@ router.get('/', async (req, res) => {
   }
 });
 
-// GET /api/assets/:id - Single asset
+// GET /api/assets/:id - Single asset (must belong to current user)
 router.get('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const row = await db.get('SELECT * FROM assets WHERE id = ?', [id]);
+    const row = await db.get('SELECT * FROM assets WHERE id = ? AND user_id = ?', [id, req.userId]);
 
     if (!row) {
       return res.status(404).json({ success: false, message: 'Asset not found' });
@@ -187,8 +192,8 @@ router.post('/upload', upload.array('files', 10), async (req, res) => {
       const result = await db.run(
         `INSERT INTO assets (
           title, filename, original_name, file_path, mime_type, file_type,
-          category, size_bytes, tags, description, created_at, downloads_count
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          category, size_bytes, tags, description, created_at, downloads_count, user_id
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           assetTitle,
           file.filename,
@@ -201,11 +206,12 @@ router.post('/upload', upload.array('files', 10), async (req, res) => {
           assetTags,
           assetDesc,
           createdAt,
-          0
+          0,
+          req.userId
         ]
       );
 
-      await logActivity('Uploaded', assetTitle, `Uploaded file ${file.originalname} (${formatBytes(file.size)})`);
+      await logActivity('Uploaded', assetTitle, `Uploaded file ${file.originalname} (${formatBytes(file.size)})`, req.userId);
 
       insertedAssets.push({
         id: Number(result.lastInsertRowid || 0),
@@ -237,11 +243,11 @@ router.post('/upload', upload.array('files', 10), async (req, res) => {
   }
 });
 
-// PUT /api/assets/:id - Update metadata
+// PUT /api/assets/:id - Update metadata (must belong to current user)
 router.put('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const existing = await db.get('SELECT * FROM assets WHERE id = ?', [id]);
+    const existing = await db.get('SELECT * FROM assets WHERE id = ? AND user_id = ?', [id, req.userId]);
     if (!existing) {
       return res.status(404).json({ success: false, message: 'Asset not found.' });
     }
@@ -253,11 +259,11 @@ router.put('/:id', async (req, res) => {
     const newDesc = description !== undefined ? description.trim() : existing.description;
 
     await db.run(
-      'UPDATE assets SET title = ?, category = ?, tags = ?, description = ? WHERE id = ?',
-      [newTitle, newCategory, newTags, newDesc, id]
+      'UPDATE assets SET title = ?, category = ?, tags = ?, description = ? WHERE id = ? AND user_id = ?',
+      [newTitle, newCategory, newTags, newDesc, id, req.userId]
     );
 
-    await logActivity('Edited', newTitle, `Updated metadata for asset #${id}`);
+    await logActivity('Edited', newTitle, `Updated metadata for asset #${id}`, req.userId);
 
     const updated = await db.get('SELECT * FROM assets WHERE id = ?', [id]);
     const ext = path.extname(updated.filename).toLowerCase();
@@ -280,23 +286,23 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-// DELETE /api/assets/:id - Delete asset and remove file
+// DELETE /api/assets/:id - Delete asset (must belong to current user)
 router.delete('/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const asset = await db.get('SELECT * FROM assets WHERE id = ?', [id]);
+    const asset = await db.get('SELECT * FROM assets WHERE id = ? AND user_id = ?', [id, req.userId]);
 
     if (!asset) {
       return res.status(404).json({ success: false, message: 'Asset not found.' });
     }
 
     // Delete DB record
-    await db.run('DELETE FROM assets WHERE id = ?', [id]);
+    await db.run('DELETE FROM assets WHERE id = ? AND user_id = ?', [id, req.userId]);
 
     // Delete file from Supabase Storage / disk
     await deleteFromStorage(asset.filename);
 
-    await logActivity('Deleted', asset.title, `Deleted asset #${id} (${asset.original_name})`);
+    await logActivity('Deleted', asset.title, `Deleted asset #${id} (${asset.original_name})`, req.userId);
 
     res.json({ success: true, message: `Asset "${asset.title}" deleted successfully.` });
   } catch (err) {
@@ -304,11 +310,11 @@ router.delete('/:id', async (req, res) => {
   }
 });
 
-// GET /api/assets/:id/download - Trigger download & increment counter
+// GET /api/assets/:id/download - Trigger download & increment counter (must belong to current user)
 router.get('/:id/download', async (req, res) => {
   try {
     const id = parseInt(req.params.id, 10);
-    const asset = await db.get('SELECT * FROM assets WHERE id = ?', [id]);
+    const asset = await db.get('SELECT * FROM assets WHERE id = ? AND user_id = ?', [id, req.userId]);
 
     if (!asset) {
       return res.status(404).json({ success: false, message: 'Asset not found.' });
@@ -316,7 +322,7 @@ router.get('/:id/download', async (req, res) => {
 
     // Increment downloads count
     await db.run('UPDATE assets SET downloads_count = downloads_count + 1 WHERE id = ?', [id]);
-    await logActivity('Downloaded', asset.title, `Downloaded file: ${asset.original_name}`);
+    await logActivity('Downloaded', asset.title, `Downloaded file: ${asset.original_name}`, req.userId);
 
     // If cloud stored, redirect to cloud file
     if (asset.file_path && asset.file_path.startsWith('http')) {

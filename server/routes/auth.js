@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { db } = require('../db');
+const { createToken, verifyToken } = require('../middleware/auth');
 const fs = require('fs');
 const path = require('path');
 
@@ -311,31 +312,55 @@ router.post('/verify-otp', async (req, res) => {
     // Clear OTP record from database
     await db.run('DELETE FROM otp_sessions WHERE phone = ?', [phone]);
 
-    // Generate authenticated session token
-    const token = 'dam_session_' + Math.random().toString(36).substr(2) + Date.now().toString(36);
+    // Look up or create user in users table
+    let user = await db.get('SELECT * FROM users WHERE phone = ?', [phone]);
+    if (!user) {
+        const result = await db.run(
+            `INSERT INTO users (phone, name, role) VALUES (?, 'User', 'user')`,
+            [phone]
+        );
+        const newId = Number(result.lastInsertRowid || 0);
+        user = { id: newId, phone, name: 'User', role: 'user' };
+        console.log(`✅ New user registered: ${phone} (id=${newId})`);
+    } else {
+        console.log(`✅ Existing user logged in: ${phone} (id=${user.id})`);
+    }
+
+    // Generate signed session token with userId embedded (24h expiry)
+    const token = createToken({
+        userId: user.id,
+        phone: user.phone,
+        role: user.role,
+        name: user.name,
+        exp: Date.now() + 24 * 60 * 60 * 1000
+    });
 
     return res.json({
         success: true,
         message: 'Authentication successful! Welcome to DAM Studio.',
         token,
         user: {
-            phone,
-            name: 'Administrator',
-            role: 'Administrator'
+            id: user.id,
+            phone: user.phone,
+            name: user.name,
+            role: user.role
         }
     });
 });
 
 /**
  * GET /api/auth/session
- * Verifies if active session exists
+ * Verifies if active session exists and returns user info
  */
 router.get('/session', (req, res) => {
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer dam_session_')) {
-        return res.json({ authenticated: true, role: 'Administrator' });
+    const authHeader = req.headers.authorization || '';
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : authHeader;
+    try {
+        const payload = verifyToken(token);
+        return res.json({ authenticated: true, userId: payload.userId, phone: payload.phone, role: payload.role, name: payload.name });
+    } catch {
+        return res.json({ authenticated: false });
     }
-    return res.json({ authenticated: false });
 });
 
 module.exports = router;

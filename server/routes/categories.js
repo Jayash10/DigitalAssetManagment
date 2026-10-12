@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { db, logActivity } = require('../db');
+const { optionalAuth } = require('../middleware/auth');
 
 // Helper to map color to icon class
 function getColorClass(icon) {
@@ -14,16 +15,19 @@ function getColorClass(icon) {
 }
 
 // GET /api/categories - All categories with asset stats
-router.get('/', async (req, res) => {
+router.get('/', optionalAuth, async (req, res) => {
   try {
     const cats = await db.all('SELECT * FROM categories ORDER BY id ASC');
 
-    // Calculate asset counts and size for each category
+    // Calculate asset counts and size for each category (scoped to current user if authenticated)
     const result = await Promise.all(cats.map(async (cat) => {
-      const stats = await db.get(
-        'SELECT COUNT(*) as count, COALESCE(SUM(size_bytes), 0) as total_size FROM assets WHERE LOWER(category) = LOWER(?)',
-        [cat.name]
-      );
+      let sql = 'SELECT COUNT(*) as count, COALESCE(SUM(size_bytes), 0) as total_size FROM assets WHERE LOWER(category) = LOWER(?)';
+      const params = [cat.name];
+      if (req.userId) {
+        sql += ' AND user_id = ?';
+        params.push(req.userId);
+      }
+      const stats = await db.get(sql, params);
 
       return {
         ...cat,

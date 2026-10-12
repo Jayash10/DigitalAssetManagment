@@ -1019,3 +1019,22 @@ select {
     background: var(--danger-light);
 }
 
+/* ====================================================
+   11. PLUGINS ECOSYSTEM STYLING
+   ==================================================== */
+.plugin-card {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+}
+
+.plugin-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-lg), 0 0 20px rgba(99, 102, 241, 0.08);
+    border-color: rgba(99, 102, 241, 0.3) !important;
+}
+
+.active-filter-tab {
+    background: var(--primary) !important;
+    color: #ffffff !important;
+    border-color: var(--primary) !important;
+    box-shadow: 0 2px 10px rgba(99, 102, 241, 0.35);
+}

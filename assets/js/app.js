@@ -2,12 +2,42 @@
  * Core Application Controller - Digital Asset Management System (SPA)
  */
 
+// ============================================================
+// GLOBAL FETCH INTERCEPTOR — auto-injects Auth token for /api/
+// ============================================================
+(function () {
+    const _nativeFetch = window.fetch.bind(window);
+    window.fetch = function (resource, init = {}) {
+        const url = typeof resource === 'string' ? resource : (resource.url || '');
+        // Only inject token for our own API calls
+        if (url.startsWith('/api/')) {
+            const token = localStorage.getItem('dam_token');
+            if (token) {
+                init.headers = Object.assign({}, init.headers || {}, {
+                    'Authorization': 'Bearer ' + token
+                });
+            }
+        }
+        return _nativeFetch(resource, init).then(response => {
+            // Auto-redirect to login on 401
+            if (response.status === 401 && url.startsWith('/api/') && !url.includes('/api/auth/')) {
+                console.warn('[Auth] Session expired or invalid. Redirecting to login.');
+                localStorage.removeItem('dam_token');
+                localStorage.removeItem('dam_user');
+                window.location.href = 'login.html';
+            }
+            return response;
+        });
+    };
+})();
+
 // Global State
 window.DAM_STATE = {
     currentPage: 'pages/dashboard.html',
     currentRouteParams: {},
     categories: [],
-    profile: null
+    profile: null,
+    currentUser: JSON.parse(localStorage.getItem('dam_user') || 'null')
 };
 
 // DOM Content Loaded - Bootstrap
@@ -40,6 +70,8 @@ document.addEventListener('DOMContentLoaded', () => {
         navigateToPage('pages/assets.html');
     } else if (urlParams.get('page') === 'categories') {
         navigateToPage('pages/categories.html');
+    } else if (urlParams.get('page') === 'plugins') {
+        navigateToPage('pages/plugins.html');
     } else {
         navigateToPage('pages/dashboard.html');
     }
@@ -60,17 +92,27 @@ function setupNavigation() {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', () => {
-            if (confirm('Are you sure you want to log out of the DAM System?')) {
-                localStorage.removeItem('dam_token');
-                localStorage.removeItem('dam_user');
-                showToast('Session Ended', 'You have been logged out securely.', 'info');
-                setTimeout(() => {
-                    location.href = 'login.html';
-                }, 1000);
-            }
+            performLogout();
         });
     }
 }
+
+/**
+ * Global Logout Handler - Clears tokens and redirects cleanly
+ */
+function performLogout(silent = false) {
+    localStorage.removeItem('dam_token');
+    localStorage.removeItem('dam_user');
+    sessionStorage.clear();
+    window.DAM_STATE.currentUser = null;
+    if (!silent && typeof showToast === 'function') {
+        showToast('Signed Out', 'You have been logged out securely.', 'info', 1000);
+    }
+    setTimeout(() => {
+        window.location.href = '/login.html?logout=true';
+    }, silent ? 0 : 300);
+}
+window.performLogout = performLogout;
 
 /**
  * Page Navigation Controller
@@ -149,6 +191,8 @@ function dispatchPageInit(page, params) {
         initProfile();
     } else if (page.includes('settings.html') && typeof initSettings === 'function') {
         initSettings();
+    } else if (page.includes('plugins.html') && typeof initPlugins === 'function') {
+        initPlugins();
     }
 }
 
@@ -194,11 +238,20 @@ function setupTopbar() {
         });
     }
 
-    // Topbar Profile shortcut
+    // Topbar Profile shortcut and dropdown toggle
     const profileBtn = document.getElementById('topbarProfileBtn');
-    if (profileBtn) {
-        profileBtn.addEventListener('click', () => {
-            navigateToPage('pages/profile.html');
+    const profileDropdown = document.getElementById('profileDropdown');
+    if (profileBtn && profileDropdown) {
+        profileBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const isOpen = profileDropdown.style.display === 'block';
+            profileDropdown.style.display = isOpen ? 'none' : 'block';
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!profileDropdown.contains(e.target) && e.target !== profileBtn) {
+                profileDropdown.style.display = 'none';
+            }
         });
     }
 
@@ -226,8 +279,24 @@ function setupTopbar() {
  * Fetch and update Global Profile details in Topbar
  */
 async function loadGlobalProfile() {
+    // Immediately populate topbar from stored user data
+    const storedUser = window.DAM_STATE.currentUser;
+    if (storedUser) {
+        const nameEl = document.getElementById('topbarUserName');
+        const roleEl = document.getElementById('topbarUserRole');
+        const dropName = document.getElementById('dropMenuName');
+        const dropPhone = document.getElementById('dropMenuPhone');
+
+        const cName = storedUser.name || storedUser.phone || 'Citizen';
+        if (nameEl) nameEl.innerText = cName;
+        if (roleEl) roleEl.innerText = storedUser.role === 'admin' ? 'Administrator' : (storedUser.isDigilockerVerified ? 'DigiLocker Citizen' : 'User');
+        if (dropName) dropName.innerText = cName;
+        if (dropPhone) dropPhone.innerText = storedUser.phone || (storedUser.isDigilockerVerified ? 'DigiLocker ID Verified' : 'Active Account');
+    }
+
     try {
         const res = await fetch('/api/profile');
+        if (res.status === 401) return; // handled by interceptor
         const json = await res.json();
         if (json.success) {
             window.DAM_STATE.profile = json.data;
@@ -235,8 +304,13 @@ async function loadGlobalProfile() {
             const roleEl = document.getElementById('topbarUserRole');
             const avatarEl = document.getElementById('topbarAvatar');
 
-            if (nameEl) nameEl.innerText = json.data.name;
-            if (roleEl) roleEl.innerText = json.data.role;
+            // Use stored user phone/name if profile name is generic
+            const displayName = storedUser?.name && storedUser.name !== 'User'
+                ? storedUser.name
+                : (json.data.name || storedUser?.phone || 'User');
+
+            if (nameEl) nameEl.innerText = displayName;
+            if (roleEl) roleEl.innerText = storedUser?.role || json.data.role;
             if (avatarEl && json.data.avatar_url) avatarEl.src = json.data.avatar_url;
         }
     } catch (err) {

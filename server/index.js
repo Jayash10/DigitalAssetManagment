@@ -15,6 +15,7 @@ const settingsRouter = require('./routes/settings');
 const aiRouter = require('./routes/ai');
 const authRouter = require('./routes/auth');
 const digilockerRouter = require('./routes/digilocker');
+const pluginsRouter = require('./routes/plugins');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -42,6 +43,7 @@ app.use('/api/settings', settingsRouter);
 app.use('/api/ai', aiRouter);
 app.use('/api/auth', authRouter);
 app.use('/api/digilocker', digilockerRouter);
+app.use('/api/plugins', pluginsRouter);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

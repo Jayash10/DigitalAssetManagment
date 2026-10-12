@@ -1,109 +1,462 @@
 <div class="dashboard">
-    <!-- Welcome Header -->
-    <div class="welcome-box">
-        <div>
-            <h2>Welcome Back, <span id="dashWelcomeName">Jayash</span> 👋</h2>
-            <p>Here is your digital asset ecosystem overview, AI insights, and storage utilization.</p>
-        </div>
-        <div style="display: flex; gap: 12px; z-index: 2;">
-            <button class="btn btn-ai" onclick="openAiStudio()" style="padding: 12px 20px;">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Studio
-            </button>
-            <button class="primary-btn" onclick="navigateToPage('pages/upload.html')">
-                <i class="fa-solid fa-cloud-arrow-up"></i> Upload Asset
-            </button>
-        </div>
-    </div>
 
-    <!-- Live Statistics Cards -->
-    <div class="stats">
-        <div class="stat-card" style="cursor: pointer;" onclick="navigateToPage('pages/assets.html')">
-            <div class="icon blue">
-                <i class="fa-solid fa-folder-open"></i>
-            </div>
-            <div>
-                <h3 id="dashTotalAssets">0</h3>
-                <p>Total Assets</p>
+    <!-- ============================================================ -->
+    <!-- HERO WELCOME BANNER — DigiLocker-style identity header        -->
+    <!-- ============================================================ -->
+    <div class="digi-hero-banner">
+        <!-- India Gov stripe -->
+        <div class="digi-gov-stripe">
+            <div class="digi-gov-stripe-inner">
+                <span class="digi-ashoka"><i class="fa-solid fa-landmark"></i></span>
+                <span>भारत सरकार &nbsp;|&nbsp; Government of India</span>
+                <span class="digi-sep">·</span>
+                <span>MeitY Certified Digital Public Infrastructure (DPI)</span>
+                <span class="digi-sep">·</span>
+                <span class="digi-interactive-pill" onclick="showComplianceModal()" title="Click to view ISO 27001 certificate">
+                    <i class="fa-solid fa-shield-halved" style="color:#10b981;"></i> ISO 27001 Certified <i class="fa-solid fa-arrow-up-right-from-square" style="font-size:9px; margin-left:2px;"></i>
+                </span>
+                <span class="digi-sep">·</span>
+                <span><i class="fa-solid fa-lock" style="color:#10b981;"></i> 256-bit End-to-End Encrypted</span>
             </div>
         </div>
 
-        <div class="stat-card" style="cursor: pointer;" onclick="navigateToPage('pages/assets.html', { type: 'image' })">
-            <div class="icon green">
-                <i class="fa-solid fa-image"></i>
+        <!-- Main hero body -->
+        <div class="digi-hero-body">
+            <div class="digi-hero-left">
+                <div class="digi-hero-identity">
+                    <div class="digi-avatar-ring" id="dashAvatarRing" onclick="navigateToPage('pages/profile.html')" title="View profile" style="cursor:pointer;">
+                        <img src="assets/images/user.png" alt="User Avatar" id="dashHeroAvatar" onerror="this.src='assets/images/user.svg'">
+                        <div class="digi-verified-badge"><i class="fa-solid fa-circle-check"></i></div>
+                    </div>
+                    <div class="digi-hero-info">
+                        <div class="digi-welcome-label">Welcome back,</div>
+                        <h2 class="digi-hero-name" id="dashWelcomeName">Citizen</h2>
+                        <div class="digi-hero-meta">
+                            <span class="digi-role-badge"><i class="fa-solid fa-user-shield"></i> <span id="dashHeroRole">DigiLocker Citizen</span></span>
+                            <span class="digi-sep">·</span>
+                            <span class="digi-aadhaar-pill" onclick="openDigiDoc('aadhaar')" style="cursor:pointer;" title="Click to view Aadhaar KYC card">
+                                <i class="fa-solid fa-fingerprint"></i> e-KYC Active <i class="fa-solid fa-eye" style="font-size:10px; margin-left:4px;"></i>
+                            </span>
+                            <span class="digi-sep">·</span>
+                            <span class="digi-time-pill" id="dashLiveClock">—</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div>
-                <h3 id="dashImagesCount">0</h3>
-                <p>Images</p>
-            </div>
-        </div>
 
-        <div class="stat-card" style="cursor: pointer;" onclick="navigateToPage('pages/assets.html', { type: 'video' })">
-            <div class="icon orange">
-                <i class="fa-solid fa-video"></i>
-            </div>
-            <div>
-                <h3 id="dashVideosCount">0</h3>
-                <p>Videos</p>
-            </div>
-        </div>
-
-        <div class="stat-card" style="cursor: pointer;" onclick="navigateToPage('pages/assets.html', { type: 'document' })">
-            <div class="icon red">
-                <i class="fa-solid fa-file-lines"></i>
-            </div>
-            <div>
-                <h3 id="dashDocsCount">0</h3>
-                <p>Documents</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Storage Breakdown Card -->
-    <div class="storage-card">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-            <div>
-                <h3 style="margin-bottom: 4px;">Cloud Storage Allocation</h3>
-                <p id="dashStorageText" style="color: var(--text-secondary); font-size: 14px;">Calculating storage allocation...</p>
-            </div>
-            <span class="badge-pill badge-blue" id="dashStorageBadge">0% Used</span>
-        </div>
-        <div class="progress" style="height: 12px; margin-top: 15px;">
-            <div class="progress-bar" id="dashStorageBar" style="width: 0%; transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);"></div>
-        </div>
-    </div>
-
-    <!-- Recent Uploads Table -->
-    <div class="table-card">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3 style="font-size: 18px; font-weight: 700; color: var(--text-primary);">Recent Uploads</h3>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn btn-ai" style="padding: 6px 14px; font-size: 13px;" onclick="openAiCopilot('Give me a summary of recently uploaded assets')">
-                    <i class="fa-solid fa-wand-magic-sparkles"></i> AI Summary
+            <div class="digi-hero-right">
+                <button class="btn-digi-ai" onclick="openAiStudio()">
+                    <i class="fa-solid fa-wand-magic-sparkles"></i>
+                    <span>AI Copilot</span>
                 </button>
-                <button class="btn btn-secondary" style="padding: 6px 14px; font-size: 13px;" onclick="navigateToPage('pages/assets.html')">
-                    View All Assets <i class="fa-solid fa-arrow-right" style="font-size: 11px;"></i>
+                <button class="btn-digi-upload" onclick="triggerDashboardUpload()">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span>Deposit Asset</span>
                 </button>
             </div>
         </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>Asset Name</th>
-                    <th>Category</th>
-                    <th>Size</th>
-                    <th>Upload Date</th>
-                    <th>Downloads</th>
-                    <th style="text-align: right;">Actions</th>
-                </tr>
-            </thead>
-            <tbody id="dashRecentTableBody">
-                <tr>
-                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">
-                        <i class="fa-solid fa-spinner fa-spin" style="margin-right: 8px;"></i> Loading live digital assets...
-                    </td>
-                </tr>
-            </tbody>
-        </table>
     </div>
+
+    <!-- ============================================================ -->
+    <!-- STAT CARDS — DigiLocker-style animated tiles                 -->
+    <!-- ============================================================ -->
+    <div class="digi-stats-grid">
+        <!-- Total Assets -->
+        <div class="digi-stat-tile" onclick="navigateToPage('pages/assets.html')">
+            <div class="digi-tile-glow blue"></div>
+            <div class="digi-tile-icon blue"><i class="fa-solid fa-folder-open"></i></div>
+            <div class="digi-tile-body">
+                <div class="digi-tile-value" id="dashTotalAssets">0</div>
+                <div class="digi-tile-label">Personal Vault Assets</div>
+                <div class="digi-tile-trend"><i class="fa-solid fa-arrow-trend-up"></i> Scoped to your account</div>
+            </div>
+            <div class="digi-tile-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Images -->
+        <div class="digi-stat-tile" onclick="navigateToPage('pages/assets.html', { type: 'image' })">
+            <div class="digi-tile-glow green"></div>
+            <div class="digi-tile-icon green"><i class="fa-solid fa-image"></i></div>
+            <div class="digi-tile-body">
+                <div class="digi-tile-value" id="dashImagesCount">0</div>
+                <div class="digi-tile-label">Photos &amp; Visuals</div>
+                <div class="digi-tile-trend"><i class="fa-solid fa-photo-film"></i> WebP &amp; PNG optimized</div>
+            </div>
+            <div class="digi-tile-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Documents -->
+        <div class="digi-stat-tile" onclick="navigateToPage('pages/assets.html', { type: 'document' })">
+            <div class="digi-tile-glow orange"></div>
+            <div class="digi-tile-icon orange"><i class="fa-solid fa-file-lines"></i></div>
+            <div class="digi-tile-body">
+                <div class="digi-tile-value" id="dashDocsCount">0</div>
+                <div class="digi-tile-label">Documents &amp; Reports</div>
+                <div class="digi-tile-trend"><i class="fa-solid fa-file-pdf"></i> Encrypted PDFs &amp; sheets</div>
+            </div>
+            <div class="digi-tile-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+
+        <!-- Videos -->
+        <div class="digi-stat-tile" onclick="navigateToPage('pages/assets.html', { type: 'video' })">
+            <div class="digi-tile-glow purple"></div>
+            <div class="digi-tile-icon purple"><i class="fa-solid fa-video"></i></div>
+            <div class="digi-tile-body">
+                <div class="digi-tile-value" id="dashVideosCount">0</div>
+                <div class="digi-tile-label">Media &amp; Recordings</div>
+                <div class="digi-tile-trend"><i class="fa-solid fa-clapperboard"></i> Streams &amp; MP4 clips</div>
+            </div>
+            <div class="digi-tile-arrow"><i class="fa-solid fa-chevron-right"></i></div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- INTERACTIVE DRAG & DROP QUICK INGEST ZONE                     -->
+    <!-- ============================================================ -->
+    <div class="dash-quick-dropzone" id="dashDropzone" onclick="document.getElementById('dashFileInput').click()">
+        <input type="file" id="dashFileInput" multiple style="display: none;" onchange="handleDashFilesSelected(this.files)">
+        <div class="dash-drop-icon">
+            <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        <div class="dash-drop-content">
+            <h4 class="dash-drop-title">Instant Personal Vault Deposit</h4>
+            <p class="dash-drop-sub">Drag &amp; drop any PDF, image, document, or audio file here for instant zero-latency ingest</p>
+        </div>
+        <div class="dash-drop-actions">
+            <span class="btn btn-primary btn-sm" style="pointer-events:none;">
+                <i class="fa-solid fa-folder-plus"></i> Select Files
+            </span>
+        </div>
+    </div>
+    <div id="dashUploadProgressWrap" style="display:none; margin-top:-10px; margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; font-size:12px; margin-bottom:4px;">
+            <span id="dashUploadStatusText" style="color:var(--primary); font-weight:600;"><i class="fa-solid fa-spinner fa-spin"></i> Depositing file into your vault...</span>
+            <span id="dashUploadPctText" style="font-weight:700;">45%</span>
+        </div>
+        <div style="height:6px; background:var(--border-subtle); border-radius:10px; overflow:hidden;">
+            <div id="dashUploadProgressBar" style="width:45%; height:100%; background:linear-gradient(90deg, #6366f1, #10b981); transition:width 0.3s ease;"></div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MAIN GRID — Storage + DigiLocker KYC + Activity              -->
+    <!-- ============================================================ -->
+    <div class="digi-main-grid">
+
+        <!-- LEFT COLUMN -->
+        <div class="digi-left-col">
+
+            <!-- Storage Gauge Card -->
+            <div class="digi-card digi-storage-card">
+                <div class="digi-card-header">
+                    <div class="digi-card-title">
+                        <i class="fa-solid fa-hard-drive" style="color:#6366f1;"></i>
+                        Storage Allocation &amp; Quota
+                    </div>
+                    <span class="badge-pill badge-blue" id="dashStorageBadge">0% Used</span>
+                </div>
+
+                <div class="digi-storage-gauge-row">
+                    <div class="digi-storage-gauge-wrap" onclick="showStorageDetails()" title="Click for storage analytics" style="cursor:pointer;">
+                        <svg class="digi-gauge-svg" viewBox="0 0 120 120">
+                            <circle class="digi-gauge-bg" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="0"/>
+                            <circle class="digi-gauge-fill" id="dashGaugeFill" cx="60" cy="60" r="50" stroke-dasharray="314" stroke-dashoffset="314"/>
+                        </svg>
+                        <div class="digi-gauge-center">
+                            <div class="digi-gauge-pct" id="dashGaugePct">0%</div>
+                            <div class="digi-gauge-sub">Used</div>
+                        </div>
+                    </div>
+
+                    <div class="digi-storage-breakdown">
+                        <div class="digi-storage-stat">
+                            <div class="digi-storage-dot blue"></div>
+                            <div>
+                                <div class="digi-sstat-val" id="dashStorageUsed">0 MB</div>
+                                <div class="digi-sstat-lab">Used Space</div>
+                            </div>
+                        </div>
+                        <div class="digi-storage-stat">
+                            <div class="digi-storage-dot gray"></div>
+                            <div>
+                                <div class="digi-sstat-val" id="dashStorageFree">20 GB</div>
+                                <div class="digi-sstat-lab">Available</div>
+                            </div>
+                        </div>
+                        <div class="digi-storage-stat">
+                            <div class="digi-storage-dot green"></div>
+                            <div>
+                                <div class="digi-sstat-val" id="dashStorageQuota">20 GB</div>
+                                <div class="digi-sstat-lab">Total Quota</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="digi-storage-bar-row">
+                    <div class="digi-sbar-track">
+                        <div class="digi-sbar-fill" id="dashStorageBar" style="width:0%;"></div>
+                    </div>
+                    <div class="digi-sbar-label" id="dashStorageText">Calculating...</div>
+                </div>
+
+                <div style="margin-top:14px; padding-top:12px; border-top:1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+                    <span style="font-size:12px; color:var(--text-muted);"><i class="fa-solid fa-sparkles" style="color:#8b5cf6;"></i> Auto-deduplication enabled</span>
+                    <button class="btn btn-ghost" style="padding:4px 10px; font-size:11.5px;" onclick="runStorageOptimization()">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Optimize Space
+                    </button>
+                </div>
+            </div>
+
+            <!-- DigiLocker KYC Identity & Issued Documents Card -->
+            <div class="digi-card digi-kyc-card">
+                <div class="digi-kyc-header">
+                    <div class="digi-kyc-brand">
+                        <img src="https://upload.wikimedia.org/wikipedia/en/c/c1/DigiLocker_logo.png" alt="DigiLocker" class="digi-kyc-logo" onerror="this.style.display='none'; document.getElementById('digi-logo-fallback').style.display='flex'">
+                        <div class="digi-kyc-logo-fallback" id="digi-logo-fallback" style="display:none;">
+                            <i class="fa-solid fa-landmark" style="font-size:20px; color:white;"></i>
+                        </div>
+                        <div class="digi-kyc-brand-text">
+                            <div class="digi-kyc-brand-name">DigiLocker DPI</div>
+                            <div class="digi-kyc-brand-gov">National Citizen Identity &amp; Document Gateway</div>
+                        </div>
+                    </div>
+                    <div class="digi-kyc-status-chip verified" onclick="verifyCredentialQr()" title="Click to verify live cryptographic signature" style="cursor:pointer;">
+                        <i class="fa-solid fa-circle-check"></i> <span>KYC Active</span>
+                    </div>
+                </div>
+
+                <div class="digi-kyc-body">
+                    <div class="digi-kyc-id-row">
+                        <div class="digi-kyc-field">
+                            <div class="digi-kyc-field-label">
+                                <i class="fa-solid fa-fingerprint"></i> Aadhaar UID
+                                <button type="button" class="btn-mask-toggle" onclick="toggleAadhaarMask()" title="Show/Hide full number">
+                                    <i class="fa-solid fa-eye" id="aadhaarEyeIcon"></i>
+                                </button>
+                            </div>
+                            <div class="digi-kyc-field-value" id="dashAadhaarDisplay">••••  ••••  <b>8842</b></div>
+                        </div>
+                        <div class="digi-kyc-field">
+                            <div class="digi-kyc-field-label"><i class="fa-solid fa-user-shield"></i> e-Sign Signature</div>
+                            <div class="digi-kyc-field-value" style="color:var(--success); font-weight:700; font-size:12px;">
+                                <i class="fa-solid fa-shield-check"></i> VALIDATED (CCA)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="digi-kyc-id-row">
+                        <div class="digi-kyc-field">
+                            <div class="digi-kyc-field-label"><i class="fa-solid fa-file-shield"></i> Identity Authority</div>
+                            <div class="digi-kyc-field-value" style="font-size:12px;">UIDAI / API Setu National Gateway</div>
+                        </div>
+                        <div class="digi-kyc-field">
+                            <div class="digi-kyc-field-label"><i class="fa-solid fa-calendar-check"></i> Issued Date</div>
+                            <div class="digi-kyc-field-value" id="dashKycDate" style="font-size:12px;">—</div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Issued Government Documents Pills -->
+                    <div style="margin-top:16px;">
+                        <div style="font-size:12px; font-weight:700; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; display:flex; justify-content:space-between; align-items:center;">
+                            <span>Issued Government Credentials</span>
+                            <span style="font-size:11px; color:#0052cc; cursor:pointer;" onclick="fetchNewIssuerDoc()">+ Pull from Issuer</span>
+                        </div>
+                        <div class="digi-kyc-docs-row">
+                            <div class="digi-kyc-doc-chip active interactive" onclick="openDigiDoc('aadhaar')" title="Click to view official digital Aadhaar">
+                                <i class="fa-solid fa-id-card"></i> <span>Aadhaar Card</span>
+                            </div>
+                            <div class="digi-kyc-doc-chip active interactive" onclick="openDigiDoc('pan')" title="Click to view verified e-PAN Card">
+                                <i class="fa-solid fa-credit-card"></i> <span>e-PAN Card</span>
+                            </div>
+                            <div class="digi-kyc-doc-chip active interactive" onclick="openDigiDoc('driving_license')" title="Click to view digital Driving Licence">
+                                <i class="fa-solid fa-car"></i> <span>Driving Licence</span>
+                            </div>
+                            <div class="digi-kyc-doc-chip active interactive" onclick="openDigiDoc('certificate')" title="Click to view digital Degree Certificate">
+                                <i class="fa-solid fa-certificate"></i> <span>Certificate</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="digi-kyc-footer">
+                    <button class="digi-kyc-btn" onclick="openDigiDoc('aadhaar')">
+                        <i class="fa-solid fa-expand"></i> Inspect Citizen Credential
+                    </button>
+                    <div class="digi-kyc-secure-note">
+                        <i class="fa-solid fa-lock"></i> IT Act 2000 &amp; DPDP Act Compliant
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN -->
+        <div class="digi-right-col">
+
+            <!-- Live Activity Feed -->
+            <div class="digi-card digi-activity-card">
+                <div class="digi-card-header">
+                    <div class="digi-card-title">
+                        <i class="fa-solid fa-bolt" style="color:#f59e0b;"></i>
+                        Live Personal Activity
+                    </div>
+                    <div class="digi-live-dot">
+                        <span class="digi-pulse-dot"></span> Live
+                    </div>
+                </div>
+                <ul class="digi-activity-list" id="dashActivityList">
+                    <li class="digi-activity-skeleton"><div class="digi-skeleton-line long"></div><div class="digi-skeleton-line short"></div></li>
+                    <li class="digi-activity-skeleton"><div class="digi-skeleton-line long"></div><div class="digi-skeleton-line short"></div></li>
+                    <li class="digi-activity-skeleton"><div class="digi-skeleton-line long"></div><div class="digi-skeleton-line short"></div></li>
+                </ul>
+            </div>
+
+            <!-- Quick Actions Panel -->
+            <div class="digi-card digi-quickactions-card">
+                <div class="digi-card-header">
+                    <div class="digi-card-title">
+                        <i class="fa-solid fa-layer-group" style="color:#6366f1;"></i>
+                        Quick Actions &amp; Tools
+                    </div>
+                </div>
+                <div class="digi-qa-grid">
+                    <button class="digi-qa-btn" onclick="navigateToPage('pages/upload.html')">
+                        <div class="digi-qa-icon" style="background:rgba(99,102,241,0.12); color:#6366f1;">
+                            <i class="fa-solid fa-cloud-arrow-up"></i>
+                        </div>
+                        <span>Upload</span>
+                    </button>
+                    <button class="digi-qa-btn" onclick="navigateToPage('pages/assets.html')">
+                        <div class="digi-qa-icon" style="background:rgba(59,130,246,0.12); color:#3b82f6;">
+                            <i class="fa-solid fa-folder-open"></i>
+                        </div>
+                        <span>My Assets</span>
+                    </button>
+                    <button class="digi-qa-btn" onclick="navigateToPage('pages/categories.html')">
+                        <div class="digi-qa-icon" style="background:rgba(16,185,129,0.12); color:#10b981;">
+                            <i class="fa-solid fa-folder-tree"></i>
+                        </div>
+                        <span>Categories</span>
+                    </button>
+                    <button class="digi-qa-btn" onclick="navigateToPage('pages/search.html')">
+                        <div class="digi-qa-icon" style="background:rgba(245,158,11,0.12); color:#f59e0b;">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                        </div>
+                        <span>Search</span>
+                    </button>
+                    <button class="digi-qa-btn" onclick="navigateToPage('pages/plugins.html')">
+                        <div class="digi-qa-icon" style="background:rgba(168,85,247,0.12); color:#a855f7;">
+                            <i class="fa-solid fa-puzzle-piece"></i>
+                        </div>
+                        <span>Plugins</span>
+                    </button>
+                    <button class="digi-qa-btn" onclick="openAiCopilot('What digital assets should I organize or back up today?')">
+                        <div class="digi-qa-icon" style="background:linear-gradient(135deg,rgba(139,92,246,0.15),rgba(6,182,212,0.15)); color:#8b5cf6;">
+                            <i class="fa-solid fa-brain"></i>
+                        </div>
+                        <span>Ask AI</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- RECENT UPLOADS TABLE — Rich DigiLocker-style file listing     -->
+    <!-- ============================================================ -->
+    <div class="digi-card digi-table-card">
+        <div class="digi-card-header" style="flex-wrap:wrap; gap:12px; margin-bottom:14px;">
+            <div class="digi-card-title">
+                <i class="fa-solid fa-clock-rotate-left" style="color:#6366f1;"></i>
+                Recent Vault Documents
+            </div>
+            
+            <!-- Interactive Live Table Search & Filter Toolbar -->
+            <div class="digi-table-toolbar">
+                <div class="digi-table-search">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="dashTableSearch" placeholder="Filter assets by name or tag..." oninput="handleTableSearch(this.value)">
+                </div>
+
+                <div class="digi-filter-tabs">
+                    <button class="digi-tab active" data-filter="all" onclick="filterRecentAssets('all', this)">All</button>
+                    <button class="digi-tab" data-filter="document" onclick="filterRecentAssets('document', this)">Docs</button>
+                    <button class="digi-tab" data-filter="image" onclick="filterRecentAssets('image', this)">Images</button>
+                    <button class="digi-tab" data-filter="video" onclick="filterRecentAssets('video', this)">Videos</button>
+                </div>
+
+                <div style="display:flex; gap:8px;">
+                    <button class="btn btn-ai" style="padding:6px 14px; font-size:12.5px;"
+                        onclick="openAiCopilot('Give me a summary of my recently uploaded digital assets and suggest any actions I should take.')">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> AI Summary
+                    </button>
+                    <button class="btn btn-secondary" style="padding:6px 14px; font-size:12.5px;"
+                        onclick="navigateToPage('pages/assets.html')">
+                        View All <i class="fa-solid fa-arrow-right" style="font-size:11px;"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="digi-table-wrap">
+            <table class="digi-table" id="dashRecentTable">
+                <thead>
+                    <tr>
+                        <th>Asset Title &amp; File</th>
+                        <th>Category</th>
+                        <th>File Size</th>
+                        <th>Uploaded On</th>
+                        <th>Downloads</th>
+                        <th style="text-align:right;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="dashRecentTableBody">
+                    <tr>
+                        <td colspan="6" style="text-align:center; padding:40px; color:var(--text-muted);">
+                            <i class="fa-solid fa-spinner fa-spin" style="font-size:20px; color:var(--primary); margin-bottom:8px;"></i>
+                            <p>Loading personal assets...</p>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- DIGILOCKER OFFICIAL CREDENTIAL VIEWER MODAL                  -->
+    <!-- ============================================================ -->
+    <div class="modal" id="digiDocModal" style="display:none;">
+        <div class="modal-content modal-lg" style="max-width: 640px; background: var(--bg-card); border-radius: 20px; overflow: hidden; border: 1px solid var(--border-subtle); box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <div class="modal-header" style="background: linear-gradient(135deg, #003366, #0052cc); color: white; padding: 18px 24px; border:none;">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <span style="font-size:18px; color:#fbbf24;"><i class="fa-solid fa-landmark"></i></span>
+                    <div>
+                        <h3 id="digiDocModalTitle" style="color:white; font-size:17px; margin:0; font-weight:800;">Digital Document Verification</h3>
+                        <p style="color:rgba(255,255,255,0.8); font-size:11.5px; margin:2px 0 0 0;">Ministry of Electronics &amp; IT · National Digital Locker</p>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeDigiDocModal()" style="color:white; opacity:0.85; background:rgba(255,255,255,0.15); border-radius:50%; width:32px; height:32px; border:none; cursor:pointer;">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            
+            <div class="modal-body" style="padding: 24px;" id="digiDocModalContent">
+                <!-- Dynamic Government Card Renders Here -->
+            </div>
+
+            <div class="modal-footer" style="padding: 16px 24px; background: var(--bg-body); border-top: 1px solid var(--border-subtle); display:flex; justify-content:space-between; align-items:center;">
+                <div style="font-size:11.5px; color:var(--text-muted);">
+                    <i class="fa-solid fa-shield-check" style="color:var(--success);"></i> Digitally signed &amp; legally valid under IT Act 2000
+                </div>
+                <div style="display:flex; gap:10px;">
+                    <button class="btn btn-secondary" onclick="closeDigiDocModal()">Close</button>
+                    <button class="btn btn-primary" onclick="downloadCurrentDigiDoc()">
+                        <i class="fa-solid fa-download"></i> Download Verified Copy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>

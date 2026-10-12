@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - DAM Studio</title>
+    <title>Citizen Login - Digital Asset Management Studio</title>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
     <!-- Custom CSS -->
@@ -22,10 +22,10 @@
                     <i class="fa-solid fa-shapes"></i>
                 </div>
                 <h1 class="login-title">DAM Studio</h1>
-                <p class="login-subtitle">Secure access to your digital assets</p>
+                <p class="login-subtitle">National Digital Locker &amp; Asset Vault</p>
             </div>
 
-            <!-- Step 1: Mobile Number Input -->
+            <!-- Step 1: Mobile Number Input & DigiLocker Gateway -->
             <div id="step1" class="auth-step active">
                 <div class="form-group">
                     <label class="input-label">Mobile Number</label>
@@ -36,19 +36,38 @@
                 </div>
                 <div class="error-message" id="errorMsg1"></div>
                 <button id="sendOtpBtn" class="btn-primary" disabled>
-                    <span class="btn-text">Get OTP</span>
+                    <span class="btn-text">Get Secure OTP</span>
                     <span class="spinner"></span>
                 </button>
 
+                <!-- Quick Account Switcher Chips for Easy Testing -->
+                <div style="margin-top: 14px; text-align: center;">
+                    <div style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; margin-bottom: 8px; font-weight: 600;">
+                        Quick Switch Accounts
+                    </div>
+                    <div style="display: flex; gap: 6px; justify-content: center; flex-wrap: wrap;">
+                        <button type="button" class="btn-chip" onclick="quickFillPhone('9812345678', 'Priya Patel')" style="background: rgba(99,102,241,0.12); color: #818cf8; border: 1px solid rgba(99,102,241,0.25); border-radius: 20px; padding: 4px 10px; font-size: 11.5px; cursor: pointer;">
+                            👤 Priya Patel
+                        </button>
+                        <button type="button" class="btn-chip" onclick="quickFillPhone('9988776655', 'Vikramaditya')" style="background: rgba(16,185,129,0.12); color: #34d399; border: 1px solid rgba(16,185,129,0.25); border-radius: 20px; padding: 4px 10px; font-size: 11.5px; cursor: pointer;">
+                            👤 Vikramaditya
+                        </button>
+                        <button type="button" class="btn-chip" onclick="quickFillPhone('9999999999', 'Admin')" style="background: rgba(245,158,11,0.12); color: #fbbf24; border: 1px solid rgba(245,158,11,0.25); border-radius: 20px; padding: 4px 10px; font-size: 11.5px; cursor: pointer;">
+                            👑 Admin
+                        </button>
+                    </div>
+                </div>
+
                 <div class="auth-divider" style="display: flex; align-items: center; margin: 18px 0; color: #64748b; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.5px;">
                     <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
-                    <span style="padding: 0 10px; font-weight: 600;">or continue with</span>
+                    <span style="padding: 0 10px; font-weight: 600;">or authenticate via</span>
                     <div style="flex: 1; height: 1px; background: rgba(255,255,255,0.08);"></div>
                 </div>
 
-                <button id="btnDigiLockerLogin" type="button" class="btn-digilocker" style="width: 100%; padding: 12px; border-radius: 12px; background: #0052cc; color: white; border: none; font-weight: 600; font-size: 13.5px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s ease;">
+                <!-- DigiLocker Connect Button -->
+                <button id="btnDigiLockerLogin" type="button" class="btn-digilocker" style="width: 100%; padding: 12px; border-radius: 12px; background: #0052cc; color: white; border: none; font-weight: 700; font-size: 13.5px; display: flex; align-items: center; justify-content: center; gap: 8px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 14px rgba(0,82,204,0.3);">
                     <i class="fa-solid fa-id-card"></i>
-                    <span>Connect DigiLocker ID</span>
+                    <span>Connect DigiLocker ID (DPI)</span>
                 </button>
                 <div id="digilockerLoginError" style="color: #ef4444; font-size: 12.5px; margin-top: 8px; text-align: center; display: none;"></div>
             </div>
@@ -68,7 +87,7 @@
                 </div>
                 <div class="error-message" id="errorMsg2"></div>
                 <button id="verifyOtpBtn" class="btn-primary" disabled>
-                    <span class="btn-text">Verify & Proceed</span>
+                    <span class="btn-text">Verify &amp; Proceed</span>
                     <span class="spinner"></span>
                 </button>
                 
